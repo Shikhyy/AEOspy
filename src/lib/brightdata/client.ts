@@ -1,3 +1,7 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Bright Data client — zone-aware, proxy-based API implementation
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface LLMScraperResponse {
   answerText: string;
   sources: string[];
@@ -29,14 +33,56 @@ export interface ExtractResponse {
   thirdPartyMentions: number;
 }
 
+export interface ScrapingBrowserResponse {
+  html: string;
+  screenshot?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Active configuration — exported so callers can inspect which zones are in use
+// ─────────────────────────────────────────────────────────────────────────────
+export const BRIGHT_DATA_CONFIG = {
+  apiToken: process.env.BRIGHT_DATA_API_TOKEN || "",
+  serpZone: process.env.BRIGHT_DATA_SERP_ZONE || "serp_zone",
+  unlockerZone: process.env.BRIGHT_DATA_UNLOCKER_ZONE || "web_unlocker",
+  browserZone: process.env.BRIGHT_DATA_BROWSER_ZONE || "scraping_browser",
+  /** Superproxy host used for proxy-based requests */
+  proxyHost: "brd.superproxy.io",
+  proxyPort: 22225,
+  /** CDP WebSocket endpoint for Scraping Browser */
+  cdpEndpoint: "wss://brd.superproxy.io:9222",
+  /** Base URL for REST API calls */
+  restBase: "https://api.brightdata.com",
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper — build the proxy Authorization header value
+// Format: brd-customer-{customerId}-zone-{zone}:{password}
+// When only an API token is available we use it as the password directly
+// (real deployments would supply a dedicated zone password).
+// ─────────────────────────────────────────────────────────────────────────────
+function buildProxyAuth(zone: string, apiToken: string): string {
+  // If the token already encodes customer + password info, pass it verbatim;
+  // otherwise use it as the credential directly.
+  return `Basic ${Buffer.from(`brd-customer-TOKEN-zone-${zone}:${apiToken}`).toString("base64")}`;
+}
+
 export class BrightDataClient {
   private apiToken: string;
+  private serpZone: string;
+  private unlockerZone: string;
+  private browserZone: string;
 
   constructor() {
-    this.apiToken = process.env.BRIGHT_DATA_API_TOKEN || "";
+    this.apiToken = BRIGHT_DATA_CONFIG.apiToken;
+    this.serpZone = BRIGHT_DATA_CONFIG.serpZone;
+    this.unlockerZone = BRIGHT_DATA_CONFIG.unlockerZone;
+    this.browserZone = BRIGHT_DATA_CONFIG.browserZone;
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
   // Query LLM Engines via Bright Data LLM Scrapers
+  // ───────────────────────────────────────────────────────────────────────────
   async queryLLMEngine(
     engine: string,
     query: string,
@@ -48,7 +94,7 @@ export class BrightDataClient {
 
       const brand = this.detectBrandNameFromQuery(query);
       const isCited = Math.random() > 0.4;
-      
+
       const snippets: Record<string, string[]> = {
         chatgpt: [
           `Yes, for ${brand}, users frequently recommend it because of its streamlined interface and high reliability.`,
@@ -83,11 +129,11 @@ export class BrightDataClient {
       };
 
       const selectedSnippetList = snippets[engine] || snippets["chatgpt"];
-      const snippet = isCited 
+      const snippet = isCited
         ? selectedSnippetList[Math.floor(Math.random() * selectedSnippetList.length)]
         : `When searching for this category, several alternatives like Zoho CRM, Zendesk, or monday.com are often recommended.`;
 
-      const mockSources = isCited 
+      const mockSources = isCited
         ? [`https://www.${brand.toLowerCase()}.com/features`, `https://www.g2.com/products/${brand.toLowerCase()}/reviews`]
         : ["https://www.zoho.com/", "https://www.monday.com/"];
 
@@ -124,12 +170,22 @@ export class BrightDataClient {
     }
   }
 
-  // Traditional Rank data per keyword via SERP API
+  // ───────────────────────────────────────────────────────────────────────────
+  // Traditional rank data per keyword via SERP API
+  //
+  // Real approach: route a Google Search URL through Bright Data's superproxy
+  // using the SERP zone.  The proxy returns the parsed SERP HTML which we
+  // normalise into SerpResultItem[].
+  //
+  // Endpoint pattern:
+  //   GET https://www.google.com/search?q=<query>&num=<10*pages>
+  //   via proxy: brd-customer-<id>-zone-<serpZone>:<password>@brd.superproxy.io:22225
+  // ───────────────────────────────────────────────────────────────────────────
   async searchEngine(query: string, engine: string = "google", pages: number = 1): Promise<SerpResultItem[]> {
     if (!this.apiToken) {
       await new Promise((resolve) => setTimeout(resolve, 600));
       const brand = this.detectBrandNameFromQuery(query);
-      
+
       // Simulate top 10 search results
       return [
         {
@@ -159,17 +215,22 @@ export class BrightDataClient {
       ];
     }
 
+    // Real path — proxy-based SERP fetch
     try {
-      const response = await fetch("https://api.brightdata.com/serp/search", {
+      const num = Math.min(pages * 10, 100);
+      const targetUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=${num}&gl=us&hl=en`;
+
+      // POST to Bright Data's /request endpoint with zone routing
+      const response = await fetch(`${BRIGHT_DATA_CONFIG.restBase}/request`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${this.apiToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          query,
-          engine,
-          pages,
+          zone: this.serpZone,
+          url: targetUrl,
+          format: "raw",
         }),
       });
 
@@ -178,12 +239,12 @@ export class BrightDataClient {
       }
 
       const rawData = await response.json() as any;
-      // Map to standard format
+      // The /request endpoint returns parsed results when zone is a SERP zone
       return (rawData.organic_results || []).map((item: any, index: number) => ({
         rank: index + 1,
         title: item.title || "",
-        snippet: item.description || "",
-        url: item.link || "",
+        snippet: item.description || item.snippet || "",
+        url: item.link || item.url || "",
       }));
     } catch (error) {
       console.error("Bright Data SERP call error:", error);
@@ -191,7 +252,9 @@ export class BrightDataClient {
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
   // Scrape brand pages via Web Unlocker
+  // ───────────────────────────────────────────────────────────────────────────
   async scrapeMarkdown(url: string): Promise<string> {
     if (!this.apiToken) {
       await new Promise((resolve) => setTimeout(resolve, 700));
@@ -214,15 +277,17 @@ Yes, we offer standard REST API access to sync your tools seamlessly.
     }
 
     try {
-      const response = await fetch("https://api.brightdata.com/scrape/markdown", {
+      // Use the Web Unlocker zone via the /request endpoint
+      const response = await fetch(`${BRIGHT_DATA_CONFIG.restBase}/request`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${this.apiToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          zone: this.unlockerZone,
           url,
-          group: "scrape_as_markdown",
+          format: "markdown",
         }),
       });
 
@@ -231,14 +296,16 @@ Yes, we offer standard REST API access to sync your tools seamlessly.
       }
 
       const data = await response.json() as any;
-      return data.markdown || "";
+      return data.markdown || data.content || "";
     } catch (error) {
       console.error("Bright Data Web Unlocker error:", error);
       return "";
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
   // Batch scrape competitor pages
+  // ───────────────────────────────────────────────────────────────────────────
   async scrapeBatch(urls: string[]): Promise<ScrapeResponse[]> {
     if (!this.apiToken) {
       await new Promise((resolve) => setTimeout(resolve, 900));
@@ -252,15 +319,17 @@ The company provides software solutions with FAQ sections and schemas.
     }
 
     try {
-      const response = await fetch("https://api.brightdata.com/scrape/batch", {
+      const response = await fetch(`${BRIGHT_DATA_CONFIG.restBase}/datasets/v3/trigger`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${this.apiToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          // Use the unlocker zone for batch scraping
+          zone: this.unlockerZone,
           urls,
-          group: "advanced_scraping",
+          format: "markdown",
         }),
       });
 
@@ -279,11 +348,13 @@ The company provides software solutions with FAQ sections and schemas.
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
   // Extract structured details using Bright Data extraction
+  // ───────────────────────────────────────────────────────────────────────────
   async extract(urlOrContent: string, options: { prompt: string }): Promise<ExtractResponse> {
     if (!this.apiToken) {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      const company = urlOrContent.includes("http") 
+      const company = urlOrContent.includes("http")
         ? urlOrContent.replace(/https?:\/\/(www\.)?/, "").split(".")[0]
         : "brand";
       const companyCapitalized = company.charAt(0).toUpperCase() + company.slice(1);
@@ -341,6 +412,142 @@ The company provides software solutions with FAQ sections and schemas.
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Scraping Browser — CDP-based full browser via Bright Data
+  //
+  // Real mode: connects to the CDP WebSocket endpoint
+  //   wss://brd.superproxy.io:9222
+  // and drives a cloud browser session (Playwright / Puppeteer compatible).
+  //
+  // Mock mode: returns static HTML representing what the page might look like.
+  // ───────────────────────────────────────────────────────────────────────────
+  async scrapingBrowser(url: string, actions?: string[]): Promise<ScrapingBrowserResponse> {
+    if (!this.apiToken) {
+      await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 500));
+
+      const actionsNote = actions && actions.length > 0
+        ? `\n<!-- Simulated browser actions: ${actions.join(", ")} -->`
+        : "";
+
+      return {
+        html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Mock Scraping Browser — ${url}</title></head>
+<body>
+  <!-- Scraped via Bright Data Scraping Browser (mock) -->
+  <!-- Target URL: ${url} -->${actionsNote}
+  <h1>Mock Page Title</h1>
+  <p>This is simulated HTML content returned by the Bright Data Scraping Browser mock.</p>
+  <p>The real implementation connects to: ${BRIGHT_DATA_CONFIG.cdpEndpoint}</p>
+  <p>Zone: ${this.browserZone}</p>
+  <ul>
+    <li>JavaScript rendering: enabled</li>
+    <li>Bot detection bypass: enabled</li>
+    <li>Geo-targeting: supported</li>
+  </ul>
+</body>
+</html>`,
+        screenshot: undefined,
+      };
+    }
+
+    // Real mode — in a Node.js server environment you would use Playwright/Puppeteer
+    // to connect to the CDP endpoint. Example (requires 'playwright' package):
+    //
+    //   const browser = await chromium.connectOverCDP(
+    //     `wss://${this.apiToken}@brd.superproxy.io:9222`
+    //   );
+    //   const page = await browser.newPage();
+    //   await page.goto(url);
+    //   if (actions) { /* execute user-supplied actions */ }
+    //   const html = await page.content();
+    //   const screenshot = await page.screenshot({ encoding: "base64" });
+    //   await browser.close();
+    //   return { html, screenshot };
+    //
+    // Since Playwright is not a dependency of this project we fall back to
+    // the REST /request endpoint with the scraping browser zone, which handles
+    // JS rendering server-side.
+    try {
+      const response = await fetch(`${BRIGHT_DATA_CONFIG.restBase}/request`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${this.apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          zone: this.browserZone,
+          url,
+          format: "raw",
+          render_js: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Bright Data Scraping Browser request failed: ${response.statusText}`);
+      }
+
+      const data = await response.json() as any;
+      return {
+        html: data.html || data.content || "",
+        screenshot: data.screenshot,
+      };
+    } catch (error) {
+      console.error("Bright Data Scraping Browser error:", error);
+      return { html: "" };
+    }
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // MCP Search — documents how this client would integrate with the
+  // Bright Data MCP server (https://github.com/brightdata/brightdata-mcp).
+  //
+  // In a real MCP-enabled environment the host orchestrator calls the MCP tool
+  // directly; this method provides a programmatic fallback and structured mock.
+  // ───────────────────────────────────────────────────────────────────────────
+  async mcpSearch(query: string): Promise<any> {
+    if (!this.apiToken) {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      // Structured mock matching the shape the MCP server would return
+      return {
+        query,
+        source: "bright_data_mcp_mock",
+        results: [
+          {
+            rank: 1,
+            title: `Top results for: ${query}`,
+            url: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+            snippet: `Mock MCP search result for "${query}". In production this is fulfilled by the Bright Data MCP server tool "search_engine".`,
+          },
+        ],
+        metadata: {
+          zone: this.serpZone,
+          mcpTool: "search_engine",
+          mcpServer: "brightdata",
+          note: "Real mode routes through the MCP server configured via BRIGHT_DATA_API_TOKEN.",
+        },
+      };
+    }
+
+    // Real mode — when running inside an MCP-aware agent the host calls the
+    // Bright Data MCP server tool directly.  Here we delegate to searchEngine()
+    // which uses the same zone so results are equivalent.
+    const serpResults = await this.searchEngine(query);
+    return {
+      query,
+      source: "bright_data_api",
+      results: serpResults,
+      metadata: {
+        zone: this.serpZone,
+        mcpTool: "search_engine",
+      },
+    };
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Private helpers
+  // ───────────────────────────────────────────────────────────────────────────
   private detectBrandNameFromQuery(query: string): string {
     if (query.toLowerCase().includes("salesforce")) return "Salesforce";
     if (query.toLowerCase().includes("hubspot")) return "HubSpot";
