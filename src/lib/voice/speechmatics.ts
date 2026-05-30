@@ -39,7 +39,6 @@ export class SpeechmaticsClient {
 
       return await response.arrayBuffer();
     } catch (error) {
-    } catch (error) {
       console.error("Speechmatics TTS error:", error);
       throw error;
     }
