@@ -52,28 +52,41 @@ function MouseFollower() {
     const blob = blobRef.current;
     if (!blob) return;
 
+    let mouseX = -500;
+    let mouseY = -500;
+    let currentX = -500;
+    let currentY = -500;
     let rafId: number;
+
     const handleMouseMove = (e: MouseEvent) => {
-      const updatePosition = () => {
-        if (!blob) return;
-        blob.style.transform = `translate3d(${e.clientX - 250}px, ${e.clientY - 250}px, 0)`;
-      };
-      
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(updatePosition);
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+
+    const tick = () => {
+      // Linear interpolation creates a buttery smooth lagging follow
+      currentX += (mouseX - currentX) * 0.08;
+      currentY += (mouseY - currentY) * 0.08;
+
+      if (blob) {
+        blob.style.transform = `translate3d(${currentX - 250}px, ${currentY - 250}px, 0)`;
+      }
+      rafId = requestAnimationFrame(tick);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
+    tick();
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      if (rafId) cancelAnimationFrame(rafId);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
   return (
     <div 
       ref={blobRef}
-      className="fixed top-0 left-0 w-[500px] h-[500px] rounded-full bg-[var(--color-accent-primary)]/15 blur-[120px] pointer-events-none -z-10 transition-transform duration-300 ease-out will-change-transform"
+      className="fixed top-0 left-0 w-[500px] h-[500px] rounded-full bg-[var(--color-accent-primary)]/15 blur-[130px] pointer-events-none -z-10 will-change-transform"
       style={{ transform: "translate3d(-500px, -500px, 0)" }}
     />
   );
@@ -826,7 +839,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative min-h-screen font-body overflow-x-hidden bg-[var(--color-bg-base)]">
+    <div className="relative min-h-screen font-body overflow-x-hidden">
       <Grid3DFloor />
       <MouseFollower />
 
