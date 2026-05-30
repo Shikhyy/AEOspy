@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { audits } from "@/lib/db/schema";
-import { seedDemoCacheIfNeeded } from "@/lib/cache/demo-cache";
+import { demoBrandsCache } from "@/lib/cache/demo-cache";
 
 export async function POST(req: NextRequest) {
   try {
