@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  Sparkles,
   Globe,
   Zap,
   BarChart3,
@@ -40,6 +39,43 @@ function Grid3DFloor() {
       <div className="absolute inset-0 grid-3d-floor w-[200%] left-[-50%] h-[150%]" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#0E0D0B] via-transparent to-[#0E0D0B]" />
     </div>
+  );
+}
+
+// ─────────────────────────────────────────
+// Cursor Follower Component (React-Free DOM transform)
+// ─────────────────────────────────────────
+function MouseFollower() {
+  const blobRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const blob = blobRef.current;
+    if (!blob) return;
+
+    let rafId: number;
+    const handleMouseMove = (e: MouseEvent) => {
+      const updatePosition = () => {
+        if (!blob) return;
+        blob.style.transform = `translate3d(${e.clientX - 200}px, ${e.clientY - 200}px, 0)`;
+      };
+      
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updatePosition);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  return (
+    <div 
+      ref={blobRef}
+      className="fixed top-0 left-0 w-[400px] h-[400px] rounded-full bg-[var(--color-accent-primary)]/5 blur-[120px] pointer-events-none -z-20 transition-transform duration-300 ease-out will-change-transform"
+      style={{ transform: "translate3d(-400px, -400px, 0)" }}
+    />
   );
 }
 
@@ -792,6 +828,7 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen font-body overflow-x-hidden bg-[var(--color-bg-base)]">
       <Grid3DFloor />
+      <MouseFollower />
 
       {/* ── Nav ────────────────────────────────── */}
       <nav className="fixed top-0 inset-x-0 z-50 px-6 py-4 flex justify-between items-center glass-panel border-b border-[var(--color-border-subtle)] bg-[#0e0d0b]/80 backdrop-blur-md">
@@ -810,7 +847,7 @@ export default function LandingPage() {
             href="/audit"
             className="bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-primary-hover)] text-white text-xs font-mono font-medium px-4 py-2 rounded tracking-wider transition shadow-[0_0_15px_rgba(61,107,79,0.3)] flex items-center gap-1.5"
           >
-            <Sparkles size={12} /> Launch Audit
+            <Zap size={10} /> Launch Audit
           </Link>
         </div>
       </nav>
@@ -821,19 +858,6 @@ export default function LandingPage() {
           
           {/* Left: Info Scanner */}
           <div className="flex-1 flex flex-col items-start gap-6">
-            
-            {/* Top Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="bg-neutral-900 border border-neutral-800 hover:border-neutral-750 transition px-3.5 py-1.5 rounded-full flex items-center gap-2 mb-2 cursor-default"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-pulse" />
-              <span className="text-[10px] font-mono text-[var(--color-accent-primary-hover)] tracking-wider uppercase font-semibold">
-                Generative search intelligence radar
-              </span>
-            </motion.div>
 
             {/* Title */}
             <motion.h1 
@@ -939,7 +963,7 @@ export default function LandingPage() {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-[var(--color-accent-primary)] to-transparent" />
           
           <div className="w-12 h-12 rounded-2xl bg-[var(--color-accent-primary)]/10 border border-[var(--color-accent-primary)]/20 flex items-center justify-center text-[var(--color-accent-primary-hover)]">
-            <Sparkles size={22} />
+            <Zap size={22} />
           </div>
 
           <h2 className="font-display text-4xl font-light text-white leading-tight">
@@ -971,7 +995,7 @@ export default function LandingPage() {
       {/* ── Footer ────────────────────────────── */}
       <footer className="relative z-10 border-t border-neutral-900 bg-neutral-950/60 backdrop-blur px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-mono text-neutral-500">
         <div className="flex items-center gap-2">
-          <Sparkles size={12} className="text-[var(--color-accent-primary)]" />
+          <Zap size={12} className="text-[var(--color-accent-primary)]" />
           <span>© 2026 AEOspy — Answer Engine Optimization Intelligence</span>
         </div>
         <div className="flex items-center gap-6">
