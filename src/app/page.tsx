@@ -22,6 +22,7 @@ import {
   Globe,
   Plus
 } from "lucide-react";
+import Link from "next/link";
 
 // --- 3D HTML5 CANVAS PARTICLE COMPONENT ("Awareness Fog") ---
 interface Particle {
@@ -775,14 +776,19 @@ export default function AEOspyApp() {
           </div>
         </div>
 
-        {mode === "results" && (
-          <button 
-            onClick={() => setMode("idle")}
-            className="text-xs font-mono text-[var(--color-ink-secondary)] border border-[var(--color-border-default)] px-3 py-1.5 rounded hover:bg-[var(--color-bg-raised)] transition"
-          >
-            ← Scan New Brand
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {mode === "results" && (
+            <button 
+              onClick={() => setMode("idle")}
+              className="text-xs font-mono text-[var(--color-ink-secondary)] border border-[var(--color-border-default)] px-3 py-1.5 rounded hover:bg-[var(--color-bg-raised)] transition"
+            >
+              ← Scan New Brand
+            </button>
+          )}
+          <Link href="/history" className="text-xs font-mono text-[var(--color-ink-secondary)] hover:text-white transition flex items-center gap-1 border border-transparent hover:border-[var(--color-border-default)] px-3 py-1.5 rounded">
+            <Clock size={12} /> History
+          </Link>
+        </div>
       </header>
 
       {/* Main Container */}
