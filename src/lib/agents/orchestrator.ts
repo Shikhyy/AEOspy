@@ -477,10 +477,6 @@ export class AuditOrchestrator {
       this.emit({ type: "voice_brief_chunk", chunk: words[i] + " " });
       await new Promise(r => setTimeout(r, 15)); // rapid stream
     }
-
-    this.state.status = "complete";
-    this.state.completedAt = Math.floor(Date.now() / 1000);
-
     this.emit({ type: "audit_complete", auditId: this.state.id });
     return this.state;
   }
