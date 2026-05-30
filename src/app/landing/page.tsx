@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { EcosystemMarquee } from "@/components/Marquee";
+import { NeuralBackground } from "@/components/NeuralBackground";
 
 // ─────────────────────────────────────────
 // 3D Infinite Grid Floor
@@ -175,9 +176,48 @@ function AudioBriefIllustration() {
 // Hero 3D Parallax Layers Showcase
 // ─────────────────────────────────────────
 function Hero3DShowcase() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    // Mouse coordinates relative to card center
+    const mouseX = e.clientX - rect.left - width / 2;
+    const mouseY = e.clientY - rect.top - height / 2;
+
+    // Target rotation (max 15 degrees)
+    const targetRotateY = (mouseX / (width / 2)) * 15;
+    const targetRotateX = -(mouseY / (height / 2)) * 15;
+
+    setRotateX(targetRotateX);
+    setRotateY(targetRotateY);
+  };
+
+  const handleMouseLeave = () => {
+    setRotateX(0);
+    setRotateY(0);
+  };
+
   return (
-    <div className="relative w-full max-w-md h-[360px] perspective-container flex items-center justify-center select-none hidden lg:flex shrink-0">
-      <div className="relative w-[340px] h-[340px] preserve-3d transition-transform duration-700 hover:rotateY(12deg) hover:rotateX(-6deg)">
+    <div 
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative w-full max-w-md h-[360px] perspective-container flex items-center justify-center select-none hidden lg:flex shrink-0"
+    >
+      <div 
+        className="relative w-[340px] h-[340px] preserve-3d transition-transform duration-200 ease-out"
+        style={{
+          transform: `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`,
+        }}
+      >
         
         {/* Layer 1: Network graph background */}
         <div 
@@ -841,6 +881,7 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen font-body overflow-x-hidden">
       <Grid3DFloor />
+      <NeuralBackground />
       <MouseFollower />
 
       {/* ── Nav ────────────────────────────────── */}
