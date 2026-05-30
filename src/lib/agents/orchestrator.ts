@@ -7,6 +7,7 @@ import {
   hallucinationFlags, 
   actionItems 
 } from "../db/schema";
+import { eq } from "drizzle-orm";
 import { brightDataClient } from "../brightdata/client";
 import { geminiJSON, claudeJSON, claudeStream } from "../ai/client";
 import { z } from "zod";
@@ -52,9 +53,12 @@ const EnrichedKeywordsSchema = z.object({
 export class AuditOrchestrator {
   private state: AuditState;
   private onStep?: (event: any) => void;
+  private rowAlreadyCreated: boolean;
 
   constructor(domain: string, keywords: string[], geoMode: boolean = false, demoMode: boolean = false, onStep?: (event: any) => void, auditId?: string) {
     const cleanDomain = domain.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+    // If auditId is provided the POST handler already inserted the DB row — don't re-insert
+    this.rowAlreadyCreated = !!auditId;
     this.state = {
       id: auditId || `audit-${Math.random().toString(36).substring(2, 11)}`,
       domain: cleanDomain,
@@ -84,18 +88,25 @@ export class AuditOrchestrator {
   async run(): Promise<AuditState> {
     this.emit({ type: "agent_step", message: "Initializing AEOspy audit engine...", status: "running" });
 
-    // Seed database audit row as pending
-    await db.insert(audits).values({
-      id: this.state.id,
-      domain: this.state.domain,
-      brandName: this.state.brandName,
-      brandLogoUrl: this.state.brandLogoUrl,
-      keywords: JSON.stringify(this.state.keywords),
-      status: "processing",
-      createdAt: Math.floor(Date.now() / 1000),
-      geoMode: this.state.geoMode ? 1 : 0,
-      demoMode: this.state.demoMode ? 1 : 0,
-    });
+    if (this.rowAlreadyCreated) {
+      // Row was already inserted by POST /api/audit — just update status to processing
+      await db.update(audits)
+        .set({ status: "processing" })
+        .where(eq(audits.id, this.state.id));
+    } else {
+      // Standalone use: insert a fresh audit row
+      await db.insert(audits).values({
+        id: this.state.id,
+        domain: this.state.domain,
+        brandName: this.state.brandName,
+        brandLogoUrl: this.state.brandLogoUrl,
+        keywords: JSON.stringify(this.state.keywords),
+        status: "processing",
+        createdAt: Math.floor(Date.now() / 1000),
+        geoMode: this.state.geoMode ? 1 : 0,
+        demoMode: this.state.demoMode ? 1 : 0,
+      });
+    }
 
     if (this.state.demoMode) {
       return this.runDemoMode();
@@ -434,6 +445,13 @@ export class AuditOrchestrator {
         blufScore: 9,
         headingDepth: 3,
         schemaTypes: JSON.stringify(["Organization", "FAQPage"]),
+        thirdPartyMentions: 12,
+        // Store curated demo data in scrapedMarkdown as a JSON sentinel for the GET handler
+        scrapedMarkdown: JSON.stringify({
+          __demo: true,
+          citedFor: comp.citedFor,
+          differentiators: comp.differentiators,
+        }),
         createdAt: Math.floor(Date.now() / 1000),
       });
       this.state.competitorPages.push(comp);

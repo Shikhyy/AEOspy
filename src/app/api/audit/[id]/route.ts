@@ -9,6 +9,7 @@ import {
   actionItems 
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { demoBrandsCache } from "@/lib/cache/demo-cache";
 
 export async function GET(
   req: NextRequest,
@@ -82,27 +83,41 @@ export async function GET(
       gapKeywords,
     };
 
-    // Construct topCompetitors differentiators
+    // Construct topCompetitors with differentiators
     const topCompetitors = competitors.map(c => {
+      // Check for the demo sentinel stored in scrapedMarkdown
+      let demoMeta: { __demo?: boolean; citedFor?: string[]; differentiators?: string[] } | null = null;
+      try {
+        const parsed = JSON.parse(c.scrapedMarkdown || "");
+        if (parsed?.__demo === true) demoMeta = parsed;
+      } catch {
+        demoMeta = null;
+      }
+
       let schemaTypes: string[] = [];
       try {
         schemaTypes = JSON.parse(c.schemaTypes || "[]");
-      } catch (e) {
+      } catch {
         schemaTypes = [];
       }
+
+      // Use curated demo differentiators when available; fall back to computed ones
+      const differentiators: string[] = demoMeta?.differentiators ?? [
+        c.faqCount && c.faqCount > 2 ? `Provides an FAQ section containing ${c.faqCount} answer items` : null,
+        c.blufScore && c.blufScore > 7 ? "States its primary value proposition concisely in the top fold section" : null,
+        schemaTypes.length > 0 ? `Integrates structured schemas: ${schemaTypes.join(", ")}` : null,
+      ].filter(Boolean) as string[];
+
       return {
         domain: c.domain,
+        citedFor: demoMeta?.citedFor ?? [],
         url: c.url,
         entityScore: c.entityScore,
         faqCount: c.faqCount,
         blufScore: c.blufScore,
         schemaTypes,
         thirdPartyMentions: c.thirdPartyMentions,
-        differentiators: [
-          c.faqCount && c.faqCount > 2 ? `Provides an FAQ section containing ${c.faqCount} answer items` : null,
-          c.blufScore && c.blufScore > 7 ? "States its primary value proposition concisely in the top fold section" : null,
-          schemaTypes.length > 0 ? `Integrates structured schemas: ${schemaTypes.join(", ")}` : null,
-        ].filter(Boolean) as string[],
+        differentiators,
       };
     });
 
@@ -131,13 +146,30 @@ export async function GET(
       };
     });
 
-    // Construct geographical breakdown
-    const geoBreakdown = audit.geoMode === 1 ? {
-      us: Math.round((citations.filter(c => c.cited === 1).length / (citations.length || 1)) * 100) || 45,
-      uk: Math.round(((citations.filter(c => c.cited === 1).length * 0.95) / (citations.length || 1)) * 100) || 40,
-      in: Math.round(((citations.filter(c => c.cited === 1).length * 0.8) / (citations.length || 1)) * 100) || 35,
-      eu: Math.round(((citations.filter(c => c.cited === 1).length * 0.85) / (citations.length || 1)) * 100) || 38,
-    } : undefined;
+    // Construct geographical breakdown — always return us/uk/in/eu keys
+    const citedCount = citations.filter(c => c.cited === 1).length;
+    const totalCount = citations.length || 1;
+    const baseScore = Math.round((citedCount / totalCount) * 100);
+    const geoBreakdown = {
+      us: baseScore || 45,
+      uk: Math.round(baseScore * 0.95) || 40,
+      in: Math.round(baseScore * 0.80) || 35,
+      eu: Math.round(baseScore * 0.85) || 38,
+    };
+
+    // For demo audits, use the precise cached geoBreakdown and visibilityGap
+    let finalVisibilityGap = visibilityGap;
+    let finalGeoBreakdown: Record<string, number> = geoBreakdown;
+    if (audit.demoMode === 1) {
+      const slug = Object.keys(demoBrandsCache).find(k =>
+        audit.domain.includes(k)
+      ) ?? "hubspot";
+      const demoData = demoBrandsCache[slug];
+      if (demoData) {
+        finalVisibilityGap = demoData.visibilityGap;
+        if (demoData.geoBreakdown) finalGeoBreakdown = demoData.geoBreakdown;
+      }
+    }
 
     return NextResponse.json({
       audit: {
@@ -155,11 +187,11 @@ export async function GET(
       },
       citationMatrix,
       serpResults: serps.map(s => ({ keyword: s.keyword, rank: s.rank })),
-      visibilityGap,
+      visibilityGap: finalVisibilityGap,
       topCompetitors,
       hallucinationFlags: hallucinations,
       actionItems: formattedActions,
-      geoBreakdown,
+      geoBreakdown: finalGeoBreakdown,
     });
   } catch (error: any) {
     console.error("GET /api/audit/[id] error:", error);
