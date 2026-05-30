@@ -364,6 +364,178 @@ const STATS = [
 ];
 
 // ─────────────────────────────────────────
+// 3D Floating Dashboard Preview
+// ─────────────────────────────────────────
+function FloatingDashboard() {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 1000], [0, -200]);
+  
+  // Continuous 3D rotation using springs for smooth interpolation
+  const rotateX = useSpring(useTransform(scrollY, [0, 1000], [15, 30]), { stiffness: 40, damping: 20 });
+  const rotateY = useSpring(useTransform(scrollY, [0, 1000], [-10, -25]), { stiffness: 40, damping: 20 });
+  const rotateZ = useSpring(useTransform(scrollY, [0, 1000], [-5, -15]), { stiffness: 40, damping: 20 });
+  
+  return (
+    <motion.div
+      style={{
+        y,
+        rotateX,
+        rotateY,
+        rotateZ,
+        transformPerspective: 1500,
+        transformStyle: "preserve-3d"
+      }}
+      className="absolute top-[30%] right-[-10%] w-[800px] h-[500px] glass-panel rounded-2xl border border-[var(--color-accent-primary)]/20 opacity-30 pointer-events-none hidden lg:block -z-10"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent-primary-glow)] to-transparent rounded-2xl" />
+      {/* Mock Dashboard UI elements to simulate depth */}
+      <div className="p-8 flex flex-col gap-6 h-full" style={{ transform: "translateZ(30px)" }}>
+        <div className="flex justify-between items-center">
+          <div className="w-1/3 h-8 bg-white/5 rounded-lg border border-white/5" />
+          <div className="w-16 h-8 rounded-full bg-[var(--color-accent-primary)]/20 border border-[var(--color-accent-primary)]/40" />
+        </div>
+        <div className="flex gap-6">
+          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" style={{ transform: "translateZ(20px)" }} />
+          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" style={{ transform: "translateZ(40px)" }} />
+          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" style={{ transform: "translateZ(10px)" }} />
+        </div>
+        <div className="flex-1 bg-white/5 rounded-xl border border-white/5 mt-2" style={{ transform: "translateZ(50px)" }} />
+      </div>
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────
+// Parallax Features Grid
+// ─────────────────────────────────────────
+function FeaturesParallaxGrid() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  return (
+    <div ref={containerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+      {FEATURES.map((feat, i) => {
+        // Stagger columns: 0 (left), 1 (middle), 2 (right)
+        const colIndex = i % 3;
+        
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const y = useTransform(scrollYProgress, [0, 1], [
+          colIndex === 0 ? 80 : colIndex === 1 ? 150 : 40, 
+          colIndex === 0 ? -80 : colIndex === 1 ? -150 : -40
+        ]);
+
+        return (
+          <motion.div key={feat.title} style={{ y }} className="h-full">
+            <TiltCard className="p-6 flex flex-col gap-4 cursor-default group h-full">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
+                style={{ background: feat.color + "22", border: `1px solid ${feat.color}44` }}
+              >
+                <feat.icon size={20} style={{ color: feat.color }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-[var(--color-ink-primary)] mb-1.5">
+                  {feat.title}
+                </h3>
+                <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">
+                  {feat.desc}
+                </p>
+              </div>
+            </TiltCard>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────
+// Cinematic Sticky Timeline
+// ─────────────────────────────────────────
+function StickyTimeline() {
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const STEPS = [
+    { step: "01", icon: Search, title: "Enter Domain", desc: "Type your brand URL. Our agents scrape your homepage and detect brand signals, schema types, and entity footprint.", color: "#3D6B4F" },
+    { step: "02", icon: Layers, title: "Multi-Agent Audit", desc: "Six AI engines are queried in parallel. SERP ranks are retrieved. Competitors are scraped. Hallucinations are flagged.", color: "#B5714A" },
+    { step: "03", icon: TrendingUp, title: "Actionable Report", desc: "A prioritized GEO roadmap is generated. A spoken CMO briefing is narrated. You see exactly where to act.", color: "#C49040" },
+  ];
+
+  return (
+    <section ref={containerRef} className="relative z-10 h-[300vh]">
+      <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+        
+        <div className="text-center mb-16 relative z-20">
+          <span className="text-[11px] font-mono text-[var(--color-accent-copper)] uppercase tracking-widest">
+            How It Works
+          </span>
+          <h2 className="font-display text-4xl md:text-5xl font-light text-[var(--color-ink-primary)] mt-3">
+            Three steps. <span className="italic text-gradient-primary">90 seconds.</span>
+          </h2>
+        </div>
+
+        <div className="relative w-full max-w-4xl mx-auto h-[40vh] flex justify-center items-center">
+          {STEPS.map((step, i) => {
+            const rangeStart = i * 0.33;
+            const rangeMid = i * 0.33 + 0.16;
+            const rangeEnd = (i + 1) * 0.33;
+            
+            // We use hooks inside the map, which is safe here because the array length is completely static.
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const opacity = useTransform(scrollYProgress, 
+              [Math.max(0, rangeStart - 0.1), rangeStart, rangeMid, rangeEnd, Math.min(1, rangeEnd + 0.1)], 
+              [0, 0, 1, 1, 0]
+            );
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const scale = useTransform(scrollYProgress,
+              [Math.max(0, rangeStart - 0.1), rangeStart, rangeMid],
+              [0.8, 0.9, 1]
+            );
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const y = useTransform(scrollYProgress,
+              [rangeStart, rangeMid],
+              [100, 0]
+            );
+
+            return (
+              <motion.div
+                key={step.step}
+                style={{ opacity, scale, y }}
+                className="absolute inset-0 m-auto flex flex-col md:flex-row items-center gap-8 w-full max-w-2xl h-fit"
+              >
+                <div 
+                  className="w-24 h-24 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(0,0,0,0.5)] border"
+                  style={{ background: step.color + "22", borderColor: step.color + "44" }}
+                >
+                  <step.icon size={40} style={{ color: step.color }} />
+                </div>
+                <div className="glass-panel p-8 rounded-2xl flex-1 relative overflow-hidden">
+                  <div className="absolute -top-4 -right-2 p-4 font-display text-9xl font-bold opacity-5 pointer-events-none" style={{ color: step.color }}>
+                    {step.step}
+                  </div>
+                  <h3 className="font-display text-3xl text-[var(--color-ink-primary)] mb-3 flex items-center gap-3">
+                    <span className="font-mono text-[var(--color-accent-copper)] text-sm font-semibold">{step.step}.</span>
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-[var(--color-ink-secondary)] leading-relaxed max-w-md">{step.desc}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────
 // MAIN LANDING PAGE
 // ─────────────────────────────────────────
 export default function LandingPage() {
@@ -404,8 +576,10 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* ── Hero Section ─────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 text-center z-10">
-        <motion.div style={{ y: springY, opacity: heroOpacity }} className="flex flex-col items-center gap-8 max-w-4xl">
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 text-center z-10 overflow-hidden">
+        <FloatingDashboard />
+        
+        <motion.div style={{ y: springY, opacity: heroOpacity }} className="flex flex-col items-center gap-8 max-w-4xl relative z-10">
 
           {/* Badge */}
           <motion.div
@@ -459,7 +633,7 @@ export default function LandingPage() {
               <motion.button
                 whileHover={{ scale: 1.04, boxShadow: "0 0 40px rgba(61,107,79,0.8)" }}
                 whileTap={{ scale: 0.97 }}
-                className="bg-[var(--color-accent-primary)] text-white text-sm font-mono font-medium px-8 py-3.5 rounded-lg tracking-wider uppercase shadow-[0_0_25px_rgba(61,107,79,0.5)] flex items-center gap-2 transition-all"
+                className="animated-border-button bg-[var(--color-accent-primary)] text-white text-sm font-mono font-medium px-8 py-3.5 rounded-lg tracking-wider uppercase shadow-[0_0_25px_rgba(61,107,79,0.5)] flex items-center gap-2 transition-all"
               >
                 <Sparkles size={16} /> Start Free Audit
                 <ArrowRight size={16} />
@@ -538,89 +712,11 @@ export default function LandingPage() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-          {FEATURES.map((feat, i) => (
-            <TiltCard
-              key={feat.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="p-6 flex flex-col gap-4 cursor-default group"
-            >
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
-                style={{ background: feat.color + "22", border: `1px solid ${feat.color}44` }}
-              >
-                <feat.icon size={20} style={{ color: feat.color }} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm text-[var(--color-ink-primary)] mb-1.5">
-                  {feat.title}
-                </h3>
-                <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">
-                  {feat.desc}
-                </p>
-              </div>
-            </TiltCard>
-          ))}
-        </div>
+        <FeaturesParallaxGrid />
       </section>
 
       {/* ── How it Works ──────────────────────── */}
-      <section className="relative z-10 py-24 px-6 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="text-[11px] font-mono text-[var(--color-accent-copper)] uppercase tracking-widest">
-            How It Works
-          </span>
-          <h2 className="font-display text-4xl font-light text-[var(--color-ink-primary)] mt-3">
-            Three steps. <span className="italic">90 seconds.</span>
-          </h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { step: "01", icon: Search, title: "Enter Domain", desc: "Type your brand URL. Our agents scrape your homepage and detect brand signals, schema types, and entity footprint.", color: "#3D6B4F" },
-            { step: "02", icon: Layers, title: "Multi-Agent Audit", desc: "Six AI engines are queried in parallel. SERP ranks are retrieved. Competitors are scraped. Hallucinations are flagged.", color: "#B5714A" },
-            { step: "03", icon: TrendingUp, title: "Actionable Report", desc: "A prioritized GEO roadmap is generated. A spoken CMO briefing is narrated. You see exactly where to act.", color: "#C49040" },
-          ].map((step, i) => (
-            <motion.div
-              key={step.step}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="relative flex flex-col gap-4"
-            >
-              {i < 2 && (
-                <div className="hidden md:block absolute left-full top-8 w-full h-px border-t border-dashed border-[var(--color-border-strong)] -translate-x-4 z-0" />
-              )}
-              <TiltCard className="p-6 flex flex-col gap-4 relative z-10 h-full">
-                <div className="flex items-start justify-between">
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ background: step.color + "22", border: `1px solid ${step.color}44` }}
-                  >
-                    <step.icon size={20} style={{ color: step.color }} />
-                  </div>
-                  <span className="font-display text-4xl font-bold text-[var(--color-ink-ghost)]">
-                    {step.step}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm text-[var(--color-ink-primary)] mb-1.5">{step.title}</h3>
-                  <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">{step.desc}</p>
-                </div>
-              </TiltCard>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      <StickyTimeline />
 
       {/* ── CTA Section ───────────────────────── */}
       <section className="relative z-10 py-24 px-6 flex justify-center">
@@ -647,7 +743,7 @@ export default function LandingPage() {
             <motion.button
               whileHover={{ scale: 1.04, boxShadow: "0 0 50px rgba(61,107,79,0.8)" }}
               whileTap={{ scale: 0.97 }}
-              className="bg-[var(--color-accent-primary)] text-white font-mono font-medium px-10 py-4 rounded-lg tracking-wider uppercase shadow-[0_0_30px_rgba(61,107,79,0.5)] flex items-center gap-2 text-sm transition-all"
+              className="animated-border-button bg-[var(--color-accent-primary)] text-white font-mono font-medium px-10 py-4 rounded-lg tracking-wider uppercase shadow-[0_0_30px_rgba(61,107,79,0.5)] flex items-center gap-2 text-sm transition-all"
             >
               <Sparkles size={16} /> Start Your Free Audit <ArrowRight size={16} />
             </motion.button>
