@@ -414,18 +414,8 @@ export class AuditOrchestrator {
       this.emit(step.event);
     }
 
-    // Write mock SERP DB entries
+    // Emit mock SERP entries
     for (const res of cached.serpResults) {
-      await db.insert(serpResults).values({
-        id: `demo-serp-${Math.random().toString(36).substring(2, 11)}`,
-        auditId: this.state.id,
-        keyword: res.keyword,
-        domain: this.state.domain,
-        rank: res.rank,
-        serpTitle: res.serpTitle || "Search Result",
-        serpSnippet: res.serpSnippet || "Snippet",
-        createdAt: Math.floor(Date.now() / 1000),
-      });
       this.state.serpResults.push(res);
       this.emit({ type: "serp_result", keyword: res.keyword, rank: res.rank });
       await new Promise(r => setTimeout(r, 150));
@@ -438,18 +428,6 @@ export class AuditOrchestrator {
       for (const [engine, details] of Object.entries(entry.engines)) {
         this.emit({ type: "engine_start", engine, keyword: entry.keyword });
         await new Promise(r => setTimeout(r, 60 + Math.random() * 80));
-        
-        await db.insert(citationResults).values({
-          id: `demo-cit-${Math.random().toString(36).substring(2, 11)}`,
-          auditId: this.state.id,
-          keyword: entry.keyword,
-          engine,
-          cited: details.cited ? 1 : 0,
-          citationPct: details.citationPct,
-          answerText: details.answerSnippet,
-          citedSources: JSON.stringify(details.citedSources),
-          createdAt: Math.floor(Date.now() / 1000),
-        });
 
         this.state.citationResults.push({
           engine,
@@ -467,25 +445,6 @@ export class AuditOrchestrator {
     await new Promise(r => setTimeout(r, 500));
 
     for (const comp of cached.topCompetitors) {
-      await db.insert(competitorPages).values({
-        id: `demo-comp-${Math.random().toString(36).substring(2, 11)}`,
-        auditId: this.state.id,
-        url: `https://www.${comp.domain}/`,
-        domain: comp.domain,
-        entityScore: 85,
-        faqCount: 6,
-        blufScore: 9,
-        headingDepth: 3,
-        schemaTypes: JSON.stringify(["Organization", "FAQPage"]),
-        thirdPartyMentions: 12,
-        // Store curated demo data in scrapedMarkdown as a JSON sentinel for the GET handler
-        scrapedMarkdown: JSON.stringify({
-          __demo: true,
-          citedFor: comp.citedFor,
-          differentiators: comp.differentiators,
-        }),
-        createdAt: Math.floor(Date.now() / 1000),
-      });
       this.state.competitorPages.push(comp);
     }
 
@@ -493,19 +452,6 @@ export class AuditOrchestrator {
     await new Promise(r => setTimeout(r, 600));
 
     for (const flag of cached.hallucinationFlags) {
-      await db.insert(hallucinationFlags).values({
-        id: `demo-flag-${Math.random().toString(36).substring(2, 11)}`,
-        auditId: this.state.id,
-        engine: flag.engine,
-        keyword: flag.keyword,
-        claimText: flag.claimText,
-        claimType: flag.claimType,
-        verificationStatus: flag.verificationStatus,
-        brandSourceUrl: flag.brandSourceUrl,
-        severity: flag.severity,
-        explanation: flag.explanation,
-        createdAt: Math.floor(Date.now() / 1000),
-      });
       this.state.hallucinationFlags.push(flag);
     }
 
@@ -515,20 +461,6 @@ export class AuditOrchestrator {
     this.state.overallScore = cached.audit.overallScore;
 
     for (const item of cached.actionItems) {
-      await db.insert(actionItems).values({
-        id: `demo-act-${Math.random().toString(36).substring(2, 11)}`,
-        auditId: this.state.id,
-        title: item.title,
-        description: item.description,
-        pageUrl: item.pageUrl,
-        effortLevel: item.effortLevel,
-        impactLevel: item.impactLevel,
-        estimatedLift: item.estimatedLift,
-        affectedKeywords: JSON.stringify(item.affectedKeywords),
-        affectedEngines: JSON.stringify(item.affectedEngines),
-        priorityScore: item.priorityScore,
-        createdAt: Math.floor(Date.now() / 1000),
-      });
       this.state.actionItems.push(item);
     }
     this.emit({ type: "synthesis_complete", overallScore: this.state.overallScore, actionCount: this.state.actionItems.length });
@@ -546,12 +478,8 @@ export class AuditOrchestrator {
       await new Promise(r => setTimeout(r, 15)); // rapid stream
     }
 
-    // Save final complete row
-    await db.update(audits).set({
-      status: "complete",
-      overallScore: this.state.overallScore,
-      completedAt: Math.floor(Date.now() / 1000),
-    });
+    this.state.status = "complete";
+    this.state.completedAt = Math.floor(Date.now() / 1000);
 
     this.emit({ type: "audit_complete", auditId: this.state.id });
     return this.state;

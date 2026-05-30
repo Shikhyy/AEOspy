@@ -18,11 +18,25 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const auditData = await db
-      .select()
-      .from(audits)
-      .where(eq(audits.id, id))
-      .limit(1);
+    if (id.startsWith("demo-")) {
+      const slug = id.replace("demo-", "").replace("-id", "");
+      const demoData = demoBrandsCache[slug];
+      if (demoData) {
+        return NextResponse.json(demoData);
+      }
+    }
+
+    let auditData;
+    try {
+      auditData = await db
+        .select()
+        .from(audits)
+        .where(eq(audits.id, id))
+        .limit(1);
+    } catch (e) {
+      console.warn("Database select failed, returning mock empty data");
+      return NextResponse.json({ error: "Audit not found (No database)" }, { status: 404 });
+    }
 
     if (auditData.length === 0) {
       return NextResponse.json({ error: "Audit not found" }, { status: 404 });
