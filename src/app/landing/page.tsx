@@ -17,6 +17,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { EcosystemMarquee } from "@/components/Marquee";
 
 // ─────────────────────────────────────────
 // 3D Neural Network Canvas
@@ -400,48 +401,137 @@ function FloatingDashboard() {
 }
 
 // ─────────────────────────────────────────
-// Parallax Features Grid
+// Bento Features Grid
 // ─────────────────────────────────────────
-function FeaturesParallaxGrid() {
+function BentoFeaturesGrid() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
 
   return (
-    <div ref={containerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-      {FEATURES.map((feat, i) => {
-        // Stagger columns: 0 (left), 1 (middle), 2 (right)
-        const colIndex = i % 3;
-        
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const y = useTransform(scrollYProgress, [0, 1], [
-          colIndex === 0 ? 80 : colIndex === 1 ? 150 : 40, 
-          colIndex === 0 ? -80 : colIndex === 1 ? -150 : -40
-        ]);
+    <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-[auto_auto_auto] lg:grid-rows-[250px_250px] gap-4 relative z-10 max-w-6xl mx-auto w-full">
+      {/* Large Hero Feature - Spans 2 cols, 2 rows */}
+      <motion.div 
+        className="md:col-span-2 md:row-span-2 h-full"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.1 }}
+      >
+        <TiltCard className="p-8 flex flex-col justify-between cursor-default group h-full min-h-[400px] relative overflow-hidden bg-gradient-to-br from-[var(--color-bg-raised)] to-[var(--color-bg-base)] border-[var(--color-accent-primary)]/30">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-accent-primary)]/10 rounded-full blur-[80px] -mr-20 -mt-20 group-hover:bg-[var(--color-accent-primary)]/20 transition-colors duration-700" />
+          
+          <div className="relative z-10">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#3D6B4F] border border-[#3D6B4F] shadow-[0_0_20px_rgba(61,107,79,0.4)] mb-6">
+              <Globe size={24} className="text-white" />
+            </div>
+            <h3 className="font-display text-3xl text-[var(--color-ink-primary)] mb-3">
+              Global Radar Tracking
+            </h3>
+            <p className="text-sm text-[var(--color-ink-secondary)] leading-relaxed max-w-sm">
+              Scan localized AI answers across US, UK, EU, and IN markets. Detect exactly which regions are suppressing your brand visibility in real-time.
+            </p>
+          </div>
 
-        return (
-          <motion.div key={feat.title} style={{ y }} className="h-full">
-            <TiltCard className="p-6 flex flex-col gap-4 cursor-default group h-full">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
-                style={{ background: feat.color + "22", border: `1px solid ${feat.color}44` }}
-              >
-                <feat.icon size={20} style={{ color: feat.color }} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm text-[var(--color-ink-primary)] mb-1.5">
-                  {feat.title}
-                </h3>
-                <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">
-                  {feat.desc}
-                </p>
-              </div>
-            </TiltCard>
-          </motion.div>
-        );
-      })}
+          <div className="relative z-10 mt-8 flex-1 w-full rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-bg-base)]/50 overflow-hidden flex items-center justify-center p-4">
+            {/* Radar Animation CSS */}
+            <div className="relative w-32 h-32 rounded-full border border-[#3D6B4F]/30 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border border-[#3D6B4F]/10 scale-150" />
+              <div className="absolute inset-0 rounded-full border border-[#3D6B4F]/5 scale-[2]" />
+              <div className="w-2 h-2 rounded-full bg-[#3D6B4F] shadow-[0_0_10px_#3D6B4F]" />
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="absolute w-1/2 h-full top-0 right-0 origin-left border-r-2 border-[#3D6B4F] bg-gradient-to-r from-transparent to-[#3D6B4F]/20"
+                style={{ clipPath: "polygon(100% 0, 100% 50%, 0 50%)" }}
+              />
+            </div>
+          </div>
+        </TiltCard>
+      </motion.div>
+
+      {/* Medium Feature - Spans 2 cols */}
+      <motion.div 
+        className="md:col-span-2"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.2 }}
+      >
+        <TiltCard className="p-6 md:p-8 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 cursor-default group h-full bg-gradient-to-br from-[var(--color-bg-raised)] to-[var(--color-bg-base)]">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#B5714A]/20 border border-[#B5714A]/40 shrink-0">
+            <ShieldCheck size={28} className="text-[#B5714A]" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-xl text-[var(--color-ink-primary)] mb-2">
+              Hallucination Defense
+            </h3>
+            <p className="text-sm text-[var(--color-ink-secondary)] leading-relaxed">
+              Automatically flag instances where AI fabricates false negative claims or hallucinates competitor features over yours. Protect brand integrity at scale.
+            </p>
+          </div>
+        </TiltCard>
+      </motion.div>
+
+      {/* Medium Feature - Spans 2 cols */}
+      <motion.div 
+        className="md:col-span-2"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.3 }}
+      >
+        <TiltCard className="p-6 md:p-8 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 cursor-default group h-full bg-gradient-to-br from-[var(--color-bg-raised)] to-[var(--color-bg-base)]">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#C49040]/20 border border-[#C49040]/40 shrink-0">
+            <Mic2 size={28} className="text-[#C49040]" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-xl text-[var(--color-ink-primary)] mb-2">
+              Executive Voice Briefs
+            </h3>
+            <p className="text-sm text-[var(--color-ink-secondary)] leading-relaxed">
+              Generate studio-quality spoken audio summaries for stakeholders using Speechmatics TTS integration. Share reports effortlessly.
+            </p>
+          </div>
+        </TiltCard>
+      </motion.div>
+
+      {/* Small Feature */}
+      <motion.div 
+        className="md:col-span-1"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.4 }}
+      >
+        <TiltCard className="p-6 flex flex-col gap-4 cursor-default group h-full bg-[var(--color-bg-base)]">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#7A7265]/20 border border-[#7A7265]/40 transition-transform group-hover:scale-110">
+            <Network size={20} className="text-[#7A7265]" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-base text-[var(--color-ink-primary)] mb-1.5">Competitor Matrix</h3>
+            <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">Map exact semantic pathways where rivals outrank you.</p>
+          </div>
+        </TiltCard>
+      </motion.div>
+
+      {/* Small Feature */}
+      <motion.div 
+        className="md:col-span-1"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.5 }}
+      >
+        <TiltCard className="p-6 flex flex-col gap-4 cursor-default group h-full relative overflow-hidden bg-[var(--color-bg-base)]">
+          <div className="absolute inset-0 bg-[#0067B8]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#0067B8]/20 border border-[#0067B8]/40 transition-transform group-hover:scale-110">
+            <Zap size={20} className="text-[#0067B8]" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-base text-[var(--color-ink-primary)] mb-1.5">Bright Data Engine</h3>
+            <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">Built on Scraping Browser & SERP API for zero-block extraction.</p>
+          </div>
+        </TiltCard>
+      </motion.div>
     </div>
   );
 }
@@ -449,6 +539,24 @@ function FeaturesParallaxGrid() {
 // ─────────────────────────────────────────
 // Cinematic Sticky Timeline
 // ─────────────────────────────────────────
+function DataFlowBeam() {
+  return (
+    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px z-0 pointer-events-none hidden md:block">
+      <div className="w-full h-full bg-gradient-to-b from-transparent via-[var(--color-border-subtle)] to-transparent opacity-50" />
+      <motion.div
+        animate={{ y: ["-100%", "300%"] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[2px] h-48 rounded-full bg-gradient-to-b from-transparent via-[var(--color-accent-primary)] to-transparent shadow-[0_0_15px_rgba(61,107,79,0.8)]"
+      />
+      <motion.div
+        animate={{ y: ["-200%", "200%"] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear", delay: 2 }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-32 rounded-full bg-gradient-to-b from-transparent via-[#C49040] to-transparent blur-[1px] shadow-[0_0_15px_rgba(196,144,64,0.8)]"
+      />
+    </div>
+  );
+}
+
 function StickyTimeline() {
   const containerRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -465,6 +573,7 @@ function StickyTimeline() {
   return (
     <section ref={containerRef} className="relative z-10 h-[300vh]">
       <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+        <DataFlowBeam />
         
         <div className="text-center mb-16 relative z-20">
           <span className="text-[11px] font-mono text-[var(--color-accent-copper)] uppercase tracking-widest">
@@ -573,7 +682,31 @@ export default function LandingPage() {
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 text-center z-10 overflow-hidden">
         <FloatingDashboard />
         
-        <motion.div style={{ y: springY, opacity: heroOpacity }} className="flex flex-col items-center gap-8 max-w-4xl relative z-10">
+        <motion.div style={{ y: springY, opacity: heroOpacity }} className="flex flex-col items-center gap-6 relative">
+          {/* Staggered Hero Text Reveal */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
+            }}
+            className="flex flex-col items-center gap-6 relative"
+          >
+            <h1 className="font-display text-5xl md:text-7xl font-light tracking-tight text-[var(--color-ink-primary)] leading-[1.1] flex flex-wrap justify-center gap-x-4 gap-y-2">
+              <motion.span variants={wordVariants}>Your</motion.span>
+              <motion.span variants={wordVariants}>Brand</motion.span>
+              <motion.span variants={wordVariants}>is</motion.span>
+              <motion.span variants={wordVariants} className="font-semibold italic text-gradient-primary">Invisible</motion.span>
+              <br className="hidden md:block w-full" />
+              <motion.span variants={wordVariants}>to</motion.span>
+              <motion.span variants={wordVariants}>AI.</motion.span>
+            </h1>
+
+            <motion.p variants={wordVariants} className="text-lg md:text-xl text-[var(--color-ink-secondary)] max-w-2xl font-light leading-relaxed">
+              ChatGPT, Perplexity, and Gemini don't read your SEO optimized blog posts. 
+              Run a real-time extraction pipeline to uncover the <span className="text-[var(--color-ink-primary)] font-medium">Answer Engine Optimization (AEO)</span> gap.
+            </motion.p>
+          </motion.div>
 
           {/* Badge */}
           <motion.div
@@ -591,30 +724,6 @@ export default function LandingPage() {
               Built for the Generative Search Era
             </span>
           </motion.div>
-
-          {/* Main headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="font-display text-5xl sm:text-6xl md:text-7xl text-[var(--color-ink-primary)] font-light leading-[1.1] tracking-tight"
-          >
-            <TypingHeadline />
-            <br />
-            <span className="text-[var(--color-ink-secondary)] font-light">Find out with </span>
-            <span className="italic text-gradient-primary">AEOspy.</span>
-          </motion.h1>
-
-          {/* Sub-headline */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-base text-[var(--color-ink-secondary)] max-w-xl leading-relaxed"
-          >
-            The first Answer Engine Optimization radar. Audit your brand's AI citation presence,
-            detect hallucinations, and close the visibility gap — in 90 seconds.
-          </motion.p>
 
           {/* CTA Buttons */}
           <motion.div
@@ -666,6 +775,9 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* ── Marquee Section ────────────────────── */}
+      <EcosystemMarquee />
+
       {/* ── Stats Bar ─────────────────────────── */}
       <section className="relative z-10 py-6 glass-panel border-y border-[var(--color-border-subtle)]">
         <div className="flex flex-wrap justify-center gap-8 md:gap-16 px-6">
@@ -706,7 +818,7 @@ export default function LandingPage() {
           </h2>
         </motion.div>
 
-        <FeaturesParallaxGrid />
+        <BentoFeaturesGrid />
       </section>
 
       {/* ── How it Works ──────────────────────── */}
