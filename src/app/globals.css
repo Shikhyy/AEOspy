@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  /* Core surfaces */
+  --color-bg-base:        #0E0D0B;  /* near-black, warm tinted */
+  --color-bg-surface:     #161410;  /* card/panel background */
+  --color-bg-raised:      #1E1C18;  /* elevated elements */
+  --color-bg-overlay:     #252219;  /* modals, tooltips */
+
+  /* Cream / warm whites */
+  --color-ink-primary:    #F2EDE4;  /* primary text — warm cream */
+  --color-ink-secondary:  #B8AF9F;  /* secondary text */
+  --color-ink-tertiary:   #7A7265;  /* muted text, labels */
+  --color-ink-ghost:      #433E35;  /* placeholder, disabled */
+
+  /* Accent — Forest Green (primary action) */
+  --color-accent-primary:       #3D6B4F;
+  --color-accent-primary-hover: #4D8A64;
+  --color-accent-primary-muted: #1F3528;
+  --color-accent-primary-glow:  rgba(61, 107, 79, 0.15);
+
+  /* Accent — Copper (highlights, warnings, charts) */
+  --color-accent-copper:        #B5714A;
+  --color-accent-copper-muted:  #3A2519;
+  --color-accent-copper-glow:   rgba(181, 113, 74, 0.12);
+
+  /* Accent — Burnt Sienna (errors, critical states) */
+  --color-accent-error:         #B04C3A;
+  --color-accent-error-muted:   #3A1813;
+
+  /* Accent — Warm Amber (warnings) */
+  --color-accent-warn:          #C49040;
+  --color-accent-warn-muted:    #3A2B12;
+
+  /* Borders */
+  --color-border-subtle:        rgba(242, 237, 228, 0.05);
+  --color-border-default:       rgba(242, 237, 228, 0.09);
+  --color-border-strong:        rgba(242, 237, 228, 0.15);
+
+  /* Font definitions */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-ink-primary);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Ambient Radial Gradients (Atmosphere overlay) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(
+      ellipse 80% 50% at 20% 20%,
+      rgba(61, 107, 79, 0.05) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 85% 85%,
+      rgba(181, 113, 74, 0.04) 0%,
+      transparent 55%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle map grid texture on dark backgrounds */
+.map-background {
+  background-image: 
+    linear-gradient(rgba(242, 237, 228, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 237, 228, 0.015) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Texture overlay */
+.surface-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0),
+                    radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  opacity: 0.015;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Typography Utility Classes */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Animated agent feed code lines */
+.feed-line {
+  animation: feedSlide 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes feedSlide {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.feed-line.active::after {
+  content: '▊';
+  animation: blink 0.9s step-end infinite;
+  color: var(--color-accent-primary);
+  margin-left: 4px;
+}
+
+@keyframes blink {
+  from, to { opacity: 0 }
+  50% { opacity: 1 }
+}
+
+/* Engine confirmation confirmPulse animations */
+.engine-tile.cited {
+  animation: confirmPulse 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes confirmPulse {
+  0%   { box-shadow: 0 0 0 0 var(--color-accent-primary-glow); }
+  45%  { box-shadow: 0 0 0 10px var(--color-accent-primary-glow); 
+         background: var(--color-accent-primary-muted); }
+  100% { box-shadow: 0 0 0 0 transparent; 
+         background: var(--color-accent-primary-muted); }
+}
+
+/* Score counter text glow */
+.score-text-glow {
+  text-shadow: 0 0 20px var(--color-accent-primary-glow);
+}
+
+/* Custom Scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-raised);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-ghost);
+}
+
+/* Hide charts outline focus rings but keep accessible */
+.recharts-default-tooltip {
+  background-color: var(--color-bg-overlay) !important;
+  border: 1px solid var(--color-border-strong) !important;
+  color: var(--color-ink-primary) !important;
+  border-radius: 4px !important;
+}
