@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Radar, Sparkles } from 'lucide-react';
+import { Radar } from 'lucide-react';
 
 export function Logo({ size = "md", withText = true }: { size?: "sm" | "md" | "lg", withText?: boolean }) {
   const iconSize = size === "sm" ? 14 : size === "md" ? 16 : 22;
@@ -26,7 +26,6 @@ export function Logo({ size = "md", withText = true }: { size?: "sm" | "md" | "l
         {/* Center icon */}
         <div className="absolute inset-0 m-auto flex items-center justify-center z-10">
           <Radar size={iconSize} className="text-[var(--color-ink-primary)]" />
-          <Sparkles size={iconSize / 1.5} className="text-[var(--color-accent-copper)] absolute top-0.5 right-0.5 animate-pulse" />
         </div>
       </div>
       

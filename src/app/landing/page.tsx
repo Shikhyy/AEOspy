@@ -35,7 +35,7 @@ import { EcosystemMarquee } from "@/components/Marquee";
 // ─────────────────────────────────────────
 function Grid3DFloor() {
   return (
-    <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden h-[130vh]">
+    <div className="absolute inset-0 -z-20 pointer-events-none overflow-hidden h-[130vh]">
       <div className="absolute inset-0 grid-3d-floor w-[200%] left-[-50%] h-[150%]" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#0E0D0B] via-transparent to-[#0E0D0B]" />
     </div>
@@ -56,7 +56,7 @@ function MouseFollower() {
     const handleMouseMove = (e: MouseEvent) => {
       const updatePosition = () => {
         if (!blob) return;
-        blob.style.transform = `translate3d(${e.clientX - 200}px, ${e.clientY - 200}px, 0)`;
+        blob.style.transform = `translate3d(${e.clientX - 250}px, ${e.clientY - 250}px, 0)`;
       };
       
       if (rafId) cancelAnimationFrame(rafId);
@@ -73,8 +73,8 @@ function MouseFollower() {
   return (
     <div 
       ref={blobRef}
-      className="fixed top-0 left-0 w-[400px] h-[400px] rounded-full bg-[var(--color-accent-primary)]/5 blur-[120px] pointer-events-none -z-20 transition-transform duration-300 ease-out will-change-transform"
-      style={{ transform: "translate3d(-400px, -400px, 0)" }}
+      className="fixed top-0 left-0 w-[500px] h-[500px] rounded-full bg-[var(--color-accent-primary)]/15 blur-[120px] pointer-events-none -z-10 transition-transform duration-300 ease-out will-change-transform"
+      style={{ transform: "translate3d(-500px, -500px, 0)" }}
     />
   );
 }
