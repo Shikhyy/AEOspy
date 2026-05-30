@@ -29,17 +29,20 @@ AEOspy bridges this gap by orchestrating a swarm of autonomous agents that query
 - **Voice Briefings**: Stream an executive audio summary of your audit using Speechmatics TTS.
 - **Real-Time Streaming**: Watch the multi-agent orchestrator work in real-time via Server-Sent Events (SSE).
 
----
+## 🏆 Hackathon Tracks & Partner Challenges
 
-## 🕷️ Bright Data Integration
+This project was built for the **Bright Data AI Agents & Web Data Hackathon** on lablab.ai, targeting the **GTM Intelligence & Market Intelligence** track. It integrates the following partner technologies for prize eligibility:
 
-This project was built for the **Bright Data AI Agents & Web Data Hackathon** on lablab.ai, heavily leveraging Bright Data's platform:
-
-- **Web Unlocker**: Used to scrape target brand homepages and extract schema markup, headings, and value propositions without getting blocked.
-- **SERP API**: Bypasses Google's bot protection to pull accurate, localized organic search rankings for identified keywords.
-- **Scraping Browser / LLM Scraper**: Queries AI engines directly to determine if the target brand is cited in generated answers.
-- **Batch Scraping**: Extracts data from top-ranking competitor pages to perform differential analysis.
-- *(Prepared for)* **MCP Server**: The codebase includes architectural readiness for the Bright Data MCP server to enable tool-use loops directly within the orchestrator.
+- **Bright Data**: 
+  - **Web Unlocker**: Scrapes target brand homepages and extracts schema markup.
+  - **SERP API**: Bypasses bot protection to pull accurate organic search rankings.
+  - **Scraping Browser**: Queries AI engines directly (ChatGPT, Perplexity, Copilot, etc.).
+- **AI/ML API** *(Challenge: Best Use of AI/ML API)*: Powers the core intelligence layer using Gemini 1.5 Flash for rapid entity extraction and keyword generation from live web data.
+- **Speechmatics** *(Challenge: Best Use of Speechmatics)*: Adds transcription to AI agent workflows via STT, and synthesizes real-time, executive-level CMO audio briefings from the audit results via TTS.
+- **Featherless AI** *(Challenge: Best Use of Featherless AI)*: Offloads hallucination detection and claim verification to open-source models (Llama-3 70B) via serverless inference, ensuring facts match the live homepage data.
+- **Cognee** *(Challenge: Best Use of Agent Memory)*: Gives the orchestrator persistent memory across workflows to store historical audit context, competitor scores, and visibility gaps, allowing cross-session reasoning.
+- **TriggerWare.ai & Kiro**: Uses TriggerWare webhooks for post-audit event-driven workflows, and prototyped rapidly using Kiro's AI-assisted development tools.
+- *(Prepared for)* **Bright Data MCP Server**: The codebase includes architectural readiness for the Bright Data MCP server to enable tool-use loops directly within the orchestrator.
 
 ---
 

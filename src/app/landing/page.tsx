@@ -778,14 +778,15 @@ function BentoFeaturesGrid() {
             <Server size={18} className="text-[var(--color-accent-primary-hover)]" />
           </div>
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-white mb-1">Powered by Bright Data</h3>
+            <h3 className="text-base font-semibold text-white mb-1">Hackathon Integrations</h3>
             <p className="text-xs text-neutral-400 leading-relaxed mb-3">
-              Built directly on Bright Data infrastructure. Bypasses cloud protections to query models reliably using scraping browser APIs and SERP proxies.
+              Built for the lablab.ai hackathon using Bright Data infrastructure, AIML API, Anthropic, and Speechmatics to orchestrate intelligence reliably.
             </p>
-            <div className="flex gap-2 mt-2">
-              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-450">Web Unlocker</span>
-              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-450">Scraping Browser</span>
-              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-450">SERP API</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-[var(--color-accent-primary-hover)]">Bright Data</span>
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-indigo-400">Anthropic Claude</span>
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-sky-400">AIML API (Gemini)</span>
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-amber-400">Speechmatics</span>
             </div>
           </div>
         </div>

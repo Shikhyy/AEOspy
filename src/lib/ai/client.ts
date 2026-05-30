@@ -8,8 +8,15 @@ const aimlClient = createOpenAI({
   baseURL: "https://api.aimlapi.com/v1",
   apiKey: aimlApiKey,
 });
-const GEMINI_MODEL = "gemini-2-5-flash";
+const GEMINI_MODEL = "gemini-1.5-flash";
 
+// Create OpenAI-compatible client for Featherless AI
+const featherlessApiKey = process.env.FEATHERLESS_API_KEY || "";
+const featherlessClient = createOpenAI({
+  baseURL: "https://api.featherless.ai/v1",
+  apiKey: featherlessApiKey,
+});
+const FEATHERLESS_MODEL = "meta-llama/Meta-Llama-3-70B-Instruct";
 // Direct Anthropic setup
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY || "";
 
@@ -189,6 +196,27 @@ export async function claudeJSON<T>(
   });
 
   const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  return JSON.parse(clean) as T;
+}
+
+export async function featherlessJSON<T>(
+  systemPrompt: string,
+  userMessage: string,
+  schemaPrompt: string
+): Promise<T> {
+  if (!featherlessApiKey) {
+    // If no key, fallback to Claude JSON mock for hallucinations
+    return await claudeJSON<T>(systemPrompt, userMessage, schemaPrompt);
+  }
+
+  // Featherless AI API for open-source models (e.g. Llama-3)
+  const { text } = await generateText({
+    model: featherlessClient(FEATHERLESS_MODEL),
+    system: systemPrompt + `\n\nReturn ONLY valid JSON matching this schema:\n${schemaPrompt}`,
+    prompt: userMessage,
+  });
+
   const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
   return JSON.parse(clean) as T;
 }

@@ -149,7 +149,10 @@ export class BrightDataClient {
     try {
       let engineUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
       if (engine === "chatgpt") engineUrl = `https://chatgpt.com/?q=${encodeURIComponent(query)}`;
+      if (engine === "gemini") engineUrl = `https://gemini.google.com/app?q=${encodeURIComponent(query)}`;
       if (engine === "perplexity") engineUrl = `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`;
+      if (engine === "grok") engineUrl = `https://x.com/i/grok?q=${encodeURIComponent(query)}`;
+      if (engine === "copilot") engineUrl = `https://copilot.microsoft.com/chats?q=${encodeURIComponent(query)}`;
       if (engine === "claude") engineUrl = `https://claude.ai/new?q=${encodeURIComponent(query)}`;
 
       const response = await fetch(`${BRIGHT_DATA_CONFIG.restBase}/request`, {
