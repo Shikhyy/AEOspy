@@ -166,11 +166,15 @@ function InteractiveAuditSimulator() {
     setIsAudioPlaying(false);
 
     let currentLogIndex = 0;
+    const logsList = data?.logs || [];
     const interval = setInterval(() => {
-      if (currentLogIndex < data.logs.length) {
-        setVisibleLogs((prev) => [...prev, data.logs[currentLogIndex]]);
+      if (currentLogIndex < logsList.length) {
+        const nextLog = logsList[currentLogIndex];
+        if (nextLog) {
+          setVisibleLogs((prev) => [...prev, nextLog]);
+        }
         currentLogIndex++;
-        setProgress(Math.min(95, Math.floor((currentLogIndex / data.logs.length) * 100)));
+        setProgress(Math.min(95, Math.floor((currentLogIndex / logsList.length) * 100)));
       } else {
         clearInterval(interval);
         setProgress(100);
@@ -214,21 +218,24 @@ function InteractiveAuditSimulator() {
             </div>
 
             <div className="flex flex-col gap-1.5 max-h-[220px] overflow-y-auto pr-1">
-              {visibleLogs.map((log, i) => (
-                <div 
-                  key={i} 
-                  className={`transition-opacity duration-200 leading-relaxed ${
-                    log.type === "success" 
-                      ? "text-emerald-400" 
-                      : log.type === "warning" 
-                        ? "text-amber-400" 
-                        : "text-neutral-400"
-                  }`}
-                >
-                  <span className="text-neutral-600 mr-2">$</span>
-                  {log.text}
-                </div>
-              ))}
+              {visibleLogs.map((log, i) => {
+                if (!log) return null;
+                return (
+                  <div 
+                    key={i} 
+                    className={`transition-opacity duration-200 leading-relaxed ${
+                      log.type === "success" 
+                        ? "text-emerald-400" 
+                        : log.type === "warning" 
+                          ? "text-amber-400" 
+                          : "text-neutral-400"
+                    }`}
+                  >
+                    <span className="text-neutral-600 mr-2">$</span>
+                    {log.text}
+                  </div>
+                );
+              })}
               {stage === "running" && (
                 <div className="text-[var(--color-accent-primary)] flex items-center gap-1.5 mt-1 animate-pulse">
                   <span>▊</span> Running audit...
