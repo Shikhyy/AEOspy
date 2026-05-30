@@ -119,32 +119,95 @@ Simply search for **HubSpot** (`hubspot.com`), **Salesforce** (`salesforce.com`)
 
 ## 🏗️ Architecture
 
-\`\`\`text
-  Browser (Client)
-        │
-        │ (1) POST /api/audit
-        ▼
-  Next.js API Route ─── (2) Init DB ──► SQLite (Drizzle ORM)
-        │
-        │ (3) Return Stream URL
-        ▼
-  Browser (Client)
-        │
-        │ (4) GET /api/audit/[id]/stream (SSE)
-        ▼
-  AuditOrchestrator
-        │
-        ├─► Phase 1: Bright Data Web Unlocker (Brand Scrape)
-        ├─► Phase 2: Gemini / AIML API (Keyword Enrichment)
-        ├─► Phase 3: Bright Data SERP API (Organic Rank)
-        ├─► Phase 4: Bright Data LLM Scraper (AI Citations)
-        ├─► Phase 5: Bright Data Scraping Browser (Competitor Diff)
-        └─► Phase 6: Claude 3.5 Sonnet (Synthesis & Streaming)
-        │
-        │ (5) Server-Sent Events (Real-time updates)
-        ▼
-  Browser (Client)
-\`\`\`
+### System Architecture
+```mermaid
+flowchart TD
+    %% Nodes
+    BrowserClient["Browser Client (React/Framer Motion)"]
+    NextJSAPI["Next.js API Route (/api/audit)"]
+    DrizzleORM["SQLite Database (Drizzle ORM)"]
+    Orchestrator["AuditOrchestrator"]
+    SSEStream["SSE Stream Controller (/api/audit/[id]/stream)"]
+    
+    %% API Services
+    BrightDataUnlocker["Bright Data Web Unlocker"]
+    AIML["AIML API (Gemini models)"]
+    BrightDataSERP["Bright Data SERP API"]
+    BrightDataBrowser["Bright Data Scraping Browser"]
+    Claude["Anthropic API (Claude 3.5 Sonnet)"]
+    Speechmatics["Speechmatics API (Voice Briefings)"]
+
+    %% Connections
+    BrowserClient -->|1. Request Audit| NextJSAPI
+    NextJSAPI -->|2. Initialize Audit Record| DrizzleORM
+    NextJSAPI -->|3. Return Audit ID| BrowserClient
+    BrowserClient -->|4. Establish SSE connection| SSEStream
+    SSEStream -->|5. Launch Audit Pipeline| Orchestrator
+    
+    Orchestrator -->|Phase 1: Brand Scraping| BrightDataUnlocker
+    Orchestrator -->|Phase 2: Keyword Extraction| AIML
+    Orchestrator -->|Phase 3: Organic SERP Rankings| BrightDataSERP
+    Orchestrator -->|Phase 4: AI citation search| BrightDataBrowser
+    Orchestrator -->|Phase 5: Competitor Scraping| BrightDataBrowser
+    Orchestrator -->|Phase 6: Audio Briefing synthesis| Speechmatics
+    Orchestrator -->|Phase 7: Synthesis & Insights| Claude
+    
+    Orchestrator -->|Write metrics & reports| DrizzleORM
+    Orchestrator -->|Real-time update packets| SSEStream
+    SSEStream -->|6. Streamed progress updates| BrowserClient
+```
+
+### Audit Sequence Flow
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Browser (Client)
+    participant Server as Next.js API Route
+    participant DB as SQLite (Drizzle ORM)
+    participant Orch as AuditOrchestrator
+    participant BD as Bright Data APIs
+    participant AI as Gemini & Claude 3.5
+
+    User->>Server: POST /api/audit (Domain URL)
+    Server->>DB: Insert empty Audit Record (status: pending)
+    Server-->>User: Return { auditId, streamUrl }
+    
+    User->>Server: GET /api/audit/[id]/stream (Establish SSE Connection)
+    Server->>Orch: Initialize & execute audit(id)
+    
+    rect rgb(20, 20, 20)
+        Note over Orch, BD: Phase 1: Brand Scraping
+        Orch->>BD: Scraping home page (Web Unlocker)
+        BD-->>Orch: Return Markdown contents
+    end
+    
+    rect rgb(20, 20, 20)
+        Note over Orch, AI: Phase 2: Keyword Enrichment
+        Orch->>AI: Extract brand entities & target keywords (Gemini)
+        AI-->>Orch: Return keyword array
+    end
+
+    rect rgb(20, 20, 20)
+        Note over Orch, BD: Phase 3: Organic Rank Analysis
+        Orch->>BD: Query Google Search for keywords (SERP API)
+        BD-->>Orch: Return organic ranking lists
+    end
+
+    rect rgb(20, 20, 20)
+        Note over Orch, BD: Phase 4 & 5: AI Engine Citation & Competitor Diff
+        Orch->>BD: Query ChatGPT/Perplexity/Gemini (Scraping Browser)
+        BD-->>Orch: Return engine response text & sources
+    end
+
+    rect rgb(20, 20, 20)
+        Note over Orch, AI: Phase 6: Synthesis & Insights
+        Orch->>AI: Generate AEO recommendations & final score (Claude 3.5)
+        AI-->>Orch: Stream Markdown insight blocks
+    end
+    
+    Orch->>DB: Update Audit Record (status: completed, visibilityScores, reports)
+    Orch-->>User: SSE event "done" with completed payload
+```
 
 ---
 
