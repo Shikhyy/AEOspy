@@ -32,25 +32,178 @@ import { Logo } from "@/components/Logo";
 import { EcosystemMarquee } from "@/components/Marquee";
 
 // ─────────────────────────────────────────
-// Background Grid Design
+// 3D Infinite Grid Floor
 // ─────────────────────────────────────────
-function GridBackground() {
+function Grid3DFloor() {
   return (
-    <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden opacity-25">
-      <svg className="absolute inset-0 w-full h-full stroke-white/[0.02] [mask-image:radial-gradient(100%_100%_at_top_center,white,transparent)]">
-        <defs>
-          <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse" x="-1" y="-1">
-            <path d="M.5 40V.5H40" fill="none" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grid-pattern)" />
-      </svg>
+    <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden h-[130vh]">
+      <div className="absolute inset-0 grid-3d-floor w-[200%] left-[-50%] h-[150%]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0E0D0B] via-transparent to-[#0E0D0B]" />
     </div>
   );
 }
 
 // ─────────────────────────────────────────
-// Live Audit Simulator Data
+// Hand-drawn Glowing SVG Illustrations
+// ─────────────────────────────────────────
+
+function RadarIllustration() {
+  return (
+    <div className="relative w-full h-32 rounded-xl border border-neutral-850 bg-neutral-950/60 overflow-hidden flex items-center justify-center select-none">
+      <svg className="w-24 h-24 text-[var(--color-accent-primary)]/30" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="0.5" fill="none" />
+        <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="0.5" fill="none" />
+        <circle cx="50" cy="50" r="15" stroke="currentColor" strokeWidth="0.5" fill="none" />
+        <line x1="5" y1="50" x2="95" y2="50" stroke="currentColor" strokeWidth="0.5" />
+        <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" strokeWidth="0.5" />
+        <circle cx="70" cy="35" r="2" fill="var(--color-accent-primary)" className="animate-ping" />
+        <circle cx="35" cy="65" r="2.5" fill="var(--color-accent-copper)" className="animate-pulse" />
+        <motion.line 
+          x1="50" y1="50" x2="50" y2="5" 
+          stroke="var(--color-accent-primary)" strokeWidth="1"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+          style={{ originX: "50px", originY: "50px" }}
+        />
+      </svg>
+    </div>
+  );
+}
+
+function GapIllustration() {
+  return (
+    <div className="relative w-full h-32 rounded-xl border border-neutral-850 bg-neutral-950/60 overflow-hidden flex items-center justify-center p-3 select-none">
+      <svg className="w-full h-full text-neutral-800" viewBox="0 0 160 80">
+        <path d="M 15 25 Q 40 10, 80 25 T 145 25" stroke="var(--color-accent-primary)" strokeWidth="0.8" fill="none" strokeDasharray="3 3" />
+        <circle cx="15" cy="25" r="2.5" fill="var(--color-accent-primary)" />
+        <text x="15" y="16" fill="var(--color-accent-primary)" fontSize="7" fontFamily="var(--font-mono)">Organic Search</text>
+        
+        <path d="M 15 55 Q 40 70, 80 55 T 145 55" stroke="var(--color-accent-error)" strokeWidth="0.8" fill="none" />
+        <circle cx="145" cy="55" r="2.5" fill="var(--color-accent-error)" />
+        <text x="145" y="67" fill="var(--color-accent-error)" fontSize="7" fontFamily="var(--font-mono)" textAnchor="end">ChatGPT Omission</text>
+        
+        <line x1="80" y1="20" x2="80" y2="60" stroke="var(--color-accent-error)" strokeWidth="0.5" strokeDasharray="2 2" />
+        <circle cx="80" cy="40" r="3" fill="var(--color-accent-error)" className="animate-pulse" />
+      </svg>
+    </div>
+  );
+}
+
+function ShieldIllustration() {
+  return (
+    <div className="relative w-full h-32 rounded-xl border border-neutral-850 bg-neutral-950/60 overflow-hidden flex items-center justify-center select-none">
+      <svg className="w-20 h-20 text-rose-500/20" viewBox="0 0 100 100" fill="none">
+        <path d="M50 15 L80 25 V50 C80 70, 50 85, 50 85 C50 85, 20 70, 20 50 V25 L50 15 Z" stroke="currentColor" strokeWidth="0.8" />
+        <path d="M50 25 L70 32 V50 C70 65, 50 75, 50 75 C50 75, 30 65, 30 50 V32 L50 25 Z" stroke="var(--color-accent-error)" strokeWidth="0.5" strokeDasharray="3 3" />
+        <circle cx="50" cy="50" r="4" fill="var(--color-accent-error)" className="animate-pulse" />
+      </svg>
+    </div>
+  );
+}
+
+function AudioBriefIllustration() {
+  return (
+    <div className="relative w-full h-32 rounded-xl border border-neutral-850 bg-neutral-950/60 overflow-hidden flex items-center justify-center p-3 select-none">
+      <div className="w-full bg-[#161410]/90 border border-neutral-850 rounded-lg p-2 flex items-center gap-3">
+        <div className="w-7 h-7 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
+          <Mic2 size={12} className="animate-pulse" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="h-1.5 w-16 bg-neutral-850 rounded mb-1" />
+          <div className="h-1 w-10 bg-neutral-900 rounded" />
+        </div>
+        <div className="flex items-end gap-0.5 h-5 shrink-0">
+          {[15, 35, 25, 50, 20, 65, 30, 40].map((h, i) => (
+            <div key={i} className="w-0.5 bg-amber-500 rounded" style={{ height: `${h}%` }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────
+// Hero 3D Parallax Layers Showcase
+// ─────────────────────────────────────────
+function Hero3DShowcase() {
+  return (
+    <div className="relative w-full max-w-md h-[360px] perspective-container flex items-center justify-center select-none hidden lg:flex shrink-0">
+      <div className="relative w-[340px] h-[340px] preserve-3d transition-transform duration-700 hover:rotateY(12deg) hover:rotateX(-6deg)">
+        
+        {/* Layer 1: Network graph background */}
+        <div 
+          className="absolute inset-0 bg-[#3D6B4F]/5 border border-[#3D6B4F]/10 rounded-2xl p-6 backdrop-blur-[2px] transition-transform duration-500 flex items-center justify-center" 
+          style={{ transform: "translateZ(-40px)" }}
+        >
+          <svg className="w-full h-full text-[#3D6B4F]/30" fill="none">
+            <circle cx="80" cy="80" r="3" fill="currentColor" />
+            <circle cx="260" cy="80" r="3" fill="currentColor" />
+            <circle cx="80" cy="260" r="3" fill="currentColor" />
+            <circle cx="260" cy="260" r="3" fill="currentColor" />
+            <circle cx="170" cy="170" r="5" fill="currentColor" />
+            
+            <line x1="80" y1="80" x2="170" y2="170" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" />
+            <line x1="260" y1="80" x2="170" y2="170" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" />
+            <line x1="80" y1="260" x2="170" y2="170" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" />
+            <line x1="260" y1="260" x2="170" y2="170" stroke="currentColor" strokeWidth="0.8" strokeDasharray="3 3" />
+          </svg>
+          <span className="absolute top-4 left-4 font-mono text-[7px] tracking-widest text-[#3D6B4F] uppercase">System Entity Map</span>
+        </div>
+
+        {/* Layer 2: Middle glass score card */}
+        <div 
+          className="absolute top-8 left-8 w-[260px] h-[150px] bg-[#161410]/80 border border-neutral-850 rounded-2xl p-5 shadow-2xl flex flex-col justify-between" 
+          style={{ transform: "translateZ(10px)" }}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="text-[8px] font-mono text-neutral-500 uppercase tracking-widest">AEO Score</span>
+              <h4 className="text-xs font-semibold text-white mt-0.5">Citation Index</h4>
+            </div>
+            <span className="text-2xl font-display font-bold text-[#4D8A64]">87%</span>
+          </div>
+          <div className="flex gap-1 items-end h-8">
+            {[35, 55, 40, 75, 45, 90, 65, 80].map((h, i) => (
+              <div 
+                key={i} 
+                className="flex-1 bg-gradient-to-t from-[#3D6B4F] to-[#4D8A64] rounded-sm"
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Layer 3: Foreground Mini terminal scanner */}
+        <div 
+          className="absolute bottom-4 right-4 w-[240px] h-[140px] bg-black/95 border border-neutral-850 rounded-xl p-4 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] font-mono text-[8px] text-[#4D8A64] flex flex-col justify-between" 
+          style={{ transform: "translateZ(60px)" }}
+        >
+          <div className="flex items-center gap-1.5 border-b border-neutral-900 pb-1.5 mb-1">
+            <span className="w-1 h-1 rounded-full bg-rose-500" />
+            <span className="w-1 h-1 rounded-full bg-amber-500" />
+            <span className="w-1 h-1 rounded-full bg-emerald-500" />
+            <span className="text-neutral-600 ml-1 text-[7px] uppercase tracking-wider">stdout-pipe</span>
+          </div>
+          <div className="flex-1 flex flex-col gap-1 overflow-hidden">
+            <div><span className="text-neutral-700">$</span> aeospy run scan notion.so</div>
+            <div className="text-neutral-400">✓ scraping home nodes...</div>
+            <div className="text-[#B5714A]">! Gemini citation: MISSING</div>
+            <div className="text-emerald-400">✓ ChatGPT citation: OK (cited)</div>
+          </div>
+          <div className="flex justify-between items-center mt-1.5 pt-1 border-t border-neutral-900 text-neutral-600 text-[7px]">
+            <span>PID 2891</span>
+            <span className="animate-pulse flex items-center gap-1 text-[var(--color-accent-primary-hover)]">
+              <span className="w-1 h-1 rounded-full bg-[var(--color-accent-primary-hover)]" /> ACTIVE
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────
+// Live Audit Simulator Data & Component
 // ─────────────────────────────────────────
 interface LogLine {
   text: string;
@@ -146,9 +299,6 @@ const PRESETS: Record<"notion.so" | "linear.app" | "hubspot.com", PresetData> = 
   }
 };
 
-// ─────────────────────────────────────────
-// Interactive Audit Simulator Component
-// ─────────────────────────────────────────
 function InteractiveAuditSimulator() {
   const [selectedDomain, setSelectedDomain] = useState<"notion.so" | "linear.app" | "hubspot.com">("notion.so");
   const [stage, setStage] = useState<"running" | "completed">("running");
@@ -430,11 +580,11 @@ function InteractiveAuditSimulator() {
 }
 
 // ─────────────────────────────────────────
-// Bento Grid Component
+// Bento Features Section
 // ─────────────────────────────────────────
 function BentoCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
   return (
-    <div className={`bg-[#161410] border border-[var(--color-border-default)] hover:border-[var(--color-accent-primary)]/30 rounded-2xl p-6 transition-all duration-350 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--color-accent-primary-glow)] group relative overflow-hidden flex flex-col justify-between ${className}`}>
+    <div className={`bg-[#161410] border border-neutral-800 hover:border-[var(--color-accent-primary)]/40 rounded-2xl p-6 card-3d-hover ${className}`}>
       {children}
     </div>
   );
@@ -442,81 +592,66 @@ function BentoCard({ children, className = "" }: { children: React.ReactNode, cl
 
 function BentoFeaturesGrid() {
   const REGIONS = [
-    { code: "US-NY", name: "New York, USA", ping: "42ms", state: "active" },
-    { code: "UK-LD", name: "London, UK", ping: "68ms", state: "active" },
-    { code: "EU-FR", name: "Frankfurt, Germany", ping: "81ms", state: "active" },
-    { code: "IN-BL", name: "Bangalore, India", ping: "104ms", state: "active" }
+    { code: "US-NY", name: "New York, USA", ping: "42ms" },
+    { code: "UK-LD", name: "London, UK", ping: "68ms" },
+    { code: "EU-FR", name: "Frankfurt, Germany", ping: "81ms" },
+    { code: "IN-BL", name: "Bangalore, India", ping: "104ms" }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10 max-w-6xl mx-auto w-full">
       
       {/* Large Featured Card: Global Radar (Spans 2 cols, 2 rows) */}
-      <BentoCard className="md:col-span-2 md:row-span-2 min-h-[420px]">
-        <div className="relative z-10 flex-1 flex flex-col justify-between">
-          <div>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-primary-muted)] border border-[var(--color-accent-primary)]/20 mb-5">
-              <Globe size={18} className="text-[var(--color-accent-primary-hover)]" />
-            </div>
-            <h3 className="font-display text-2xl text-white mb-2 font-normal leading-tight">
-              Global Search Radar
-            </h3>
-            <p className="text-xs text-neutral-400 leading-relaxed max-w-sm">
-              Scan localized AI engine answers using residential proxies. Track citation indexes across US, UK, EU, and India instantly to check local biases.
-            </p>
+      <BentoCard className="md:col-span-2 md:row-span-2 min-h-[440px] justify-between">
+        <div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-primary-muted)] border border-[var(--color-accent-primary)]/20 mb-5">
+            <Globe size={18} className="text-[var(--color-accent-primary-hover)]" />
           </div>
+          <h3 className="font-display text-2xl text-white mb-2 font-normal leading-tight">
+            Global Search Radar
+          </h3>
+          <p className="text-xs text-neutral-450 leading-relaxed max-w-sm mb-4">
+            Scan localized AI engine answers using residential proxies. Track citation indexes across US, UK, EU, and India instantly to check local biases.
+          </p>
+        </div>
 
-          {/* Regional Table UI representation */}
-          <div className="mt-6 border border-neutral-850 rounded-xl bg-neutral-950/40 p-4 font-mono text-[10px] overflow-hidden flex flex-col gap-2.5">
-            <div className="flex text-neutral-500 border-b border-neutral-900 pb-1.5">
-              <span className="w-12 block">Region</span>
-              <span className="flex-1 block">Location Node</span>
-              <span className="w-16 text-right block">Latency</span>
-              <span className="w-14 text-right block">Status</span>
-            </div>
-            {REGIONS.map((reg) => (
-              <div key={reg.code} className="flex items-center text-neutral-300">
-                <span className="w-12 text-neutral-500">{reg.code}</span>
-                <span className="flex-1 truncate font-medium text-white">{reg.name}</span>
-                <span className="w-16 text-right text-[var(--color-accent-primary-hover)]">{reg.ping}</span>
-                <span className="w-14 text-right flex items-center justify-end gap-1 text-emerald-400">
-                  <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
-                  Live
-                </span>
-              </div>
-            ))}
+        <RadarIllustration />
+
+        {/* Regional Table UI representation */}
+        <div className="mt-4 border border-neutral-850 rounded-xl bg-neutral-950/40 p-4 font-mono text-[9px] overflow-hidden flex flex-col gap-2">
+          <div className="flex text-neutral-500 border-b border-neutral-900 pb-1">
+            <span className="w-12 block">Region</span>
+            <span className="flex-1 block">Location Node</span>
+            <span className="w-16 text-right block">Latency</span>
           </div>
+          {REGIONS.map((reg) => (
+            <div key={reg.code} className="flex items-center text-neutral-300">
+              <span className="w-12 text-neutral-500">{reg.code}</span>
+              <span className="flex-1 truncate font-medium text-white">{reg.name}</span>
+              <span className="w-16 text-right text-[var(--color-accent-primary-hover)]">{reg.ping}</span>
+            </div>
+          ))}
         </div>
       </BentoCard>
 
       {/* Feature 2: Visibility Gaps (Spans 2 cols) */}
-      <BentoCard className="md:col-span-2">
-        <div className="flex gap-5 items-start">
+      <BentoCard className="md:col-span-2 justify-between min-h-[200px]">
+        <div className="flex flex-col sm:flex-row gap-5 items-start">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-copper-glow)] border border-[var(--color-accent-copper)]/20 shrink-0">
             <BarChart3 size={18} className="text-[var(--color-accent-copper)]" />
           </div>
-          <div>
+          <div className="flex-1">
             <h3 className="text-base font-semibold text-white mb-1.5">Visibility Gap Mapping</h3>
             <p className="text-xs text-neutral-400 leading-relaxed mb-3">
               Detect terms where your brand ranks #1 organically on Google, yet AI engines completely omit your name from their summarized recommendations.
             </p>
-            {/* Visual Mini Comparison Table */}
-            <div className="border border-neutral-850 bg-neutral-950/20 rounded-lg p-2.5 font-mono text-[9px] flex justify-between items-center">
-              <div>
-                <span className="text-neutral-500 block uppercase">Query: Best wiki software</span>
-                <div className="flex gap-4 mt-1">
-                  <span className="text-white">Google SEO: <strong className="text-emerald-400">Rank #1</strong></span>
-                  <span className="text-white">ChatGPT: <strong className="text-rose-400">Not Cited</strong></span>
-                </div>
-              </div>
-              <span className="text-[8px] bg-rose-950/20 border border-rose-900/30 text-rose-400 px-2 py-0.5 rounded shrink-0">Gap Detected</span>
-            </div>
           </div>
         </div>
+        <GapIllustration />
       </BentoCard>
 
       {/* Feature 3: Voice CMO Briefing (Spans 1 col) */}
-      <BentoCard>
+      <BentoCard className="justify-between min-h-[220px]">
         <div className="flex flex-col gap-4">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-500/10 border border-amber-500/20">
             <Mic2 size={18} className="text-amber-500" />
@@ -528,13 +663,14 @@ function BentoFeaturesGrid() {
             </p>
           </div>
         </div>
+        <AudioBriefIllustration />
       </BentoCard>
 
       {/* Feature 4: Hallucination Sentinel (Spans 1 col) */}
-      <BentoCard>
+      <BentoCard className="justify-between min-h-[220px]">
         <div className="flex flex-col gap-4">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-rose-500/10 border border-rose-500/20">
-            <ShieldCheck size={18} className="text-rose-400" />
+            <ShieldCheck size={18} className="text-rose-450" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white mb-1">Hallucination Monitor</h3>
@@ -543,10 +679,11 @@ function BentoFeaturesGrid() {
             </p>
           </div>
         </div>
+        <ShieldIllustration />
       </BentoCard>
 
       {/* Feature 5: Integration layers (Spans 2 cols) */}
-      <BentoCard className="md:col-span-2">
+      <BentoCard className="md:col-span-2 justify-between">
         <div className="flex gap-5 items-start">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-accent-primary-muted)] border border-[var(--color-accent-primary)]/20 shrink-0">
             <Server size={18} className="text-[var(--color-accent-primary-hover)]" />
@@ -556,10 +693,10 @@ function BentoFeaturesGrid() {
             <p className="text-xs text-neutral-400 leading-relaxed mb-3">
               Built directly on Bright Data infrastructure. Bypasses cloud protections to query models reliably using scraping browser APIs and SERP proxies.
             </p>
-            <div className="flex gap-2">
-              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-400">Web Unlocker</span>
-              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-400">Scraping Browser</span>
-              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-400">SERP API</span>
+            <div className="flex gap-2 mt-2">
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-450">Web Unlocker</span>
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-450">Scraping Browser</span>
+              <span className="text-[9px] font-mono bg-neutral-900 border border-neutral-850 px-2 py-0.5 rounded text-neutral-450">SERP API</span>
             </div>
           </div>
         </div>
@@ -569,7 +706,7 @@ function BentoFeaturesGrid() {
 }
 
 // ─────────────────────────────────────────
-// Natural Timeline Pipeline
+// Pipeline Loop Section
 // ─────────────────────────────────────────
 const PIPELINE_STEPS = [
   {
@@ -611,7 +748,6 @@ function PipelineSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-        {/* Connection line overlay on desktop */}
         <div className="absolute top-[48px] left-16 right-16 h-[1px] border-t border-dashed border-neutral-800 hidden md:block -z-10" />
 
         {PIPELINE_STEPS.map((item) => (
@@ -655,7 +791,7 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen font-body overflow-x-hidden bg-[var(--color-bg-base)]">
-      <GridBackground />
+      <Grid3DFloor />
 
       {/* ── Nav ────────────────────────────────── */}
       <nav className="fixed top-0 inset-x-0 z-50 px-6 py-4 flex justify-between items-center glass-panel border-b border-[var(--color-border-subtle)] bg-[#0e0d0b]/80 backdrop-blur-md">
@@ -679,88 +815,106 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ── Hero Section ─────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-32 pb-16 text-center z-10">
-        
-        {/* Top Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-neutral-900 border border-neutral-800 hover:border-neutral-750 transition px-3.5 py-1.5 rounded-full flex items-center gap-2 mb-8 cursor-default"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-pulse" />
-          <span className="text-[10px] font-mono text-[var(--color-accent-primary-hover)] tracking-wider uppercase font-semibold">
-            Generative search intelligence radar
-          </span>
-        </motion.div>
+      {/* ── Hero Section (3D Split Showcase) ── */}
+      <section className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-16 z-10 max-w-6xl mx-auto w-full">
+        <div className="flex flex-col lg:flex-row items-center gap-12 text-left w-full">
+          
+          {/* Left: Info Scanner */}
+          <div className="flex-1 flex flex-col items-start gap-6">
+            
+            {/* Top Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-neutral-900 border border-neutral-800 hover:border-neutral-750 transition px-3.5 py-1.5 rounded-full flex items-center gap-2 mb-2 cursor-default"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-primary)] animate-pulse" />
+              <span className="text-[10px] font-mono text-[var(--color-accent-primary-hover)] tracking-wider uppercase font-semibold">
+                Generative search intelligence radar
+              </span>
+            </motion.div>
 
-        {/* Title */}
-        <motion.h1 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-display text-5xl md:text-8xl font-light tracking-tight text-white leading-[0.95] max-w-4xl"
-        >
-          Your Brand is <span className="font-semibold italic text-gradient-primary">Invisible</span> <br className="hidden md:block" /> to Answer Engines.
-        </motion.h1>
+            {/* Title */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="font-display text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-white leading-[0.95] max-w-xl"
+            >
+              Your Brand is <span className="font-semibold italic text-gradient-primary">Invisible</span> <br className="hidden md:block" /> to Answer Engines.
+            </motion.h1>
 
-        {/* Description */}
-        <motion.p 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-sm md:text-base text-[var(--color-ink-secondary)] max-w-xl font-light leading-relaxed mt-6"
-        >
-          ChatGPT, Perplexity, and Gemini don't read standard SEO articles. 
-          Use multi-agent crawling to audit what AI algorithms say about your brand.
-        </motion.p>
+            {/* Description */}
+            <motion.p 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xs md:text-sm text-[var(--color-ink-secondary)] max-w-md font-light leading-relaxed mt-2"
+            >
+              ChatGPT, Perplexity, and Gemini don't read standard SEO articles. 
+              Use multi-agent crawling to audit what AI algorithms say about your brand.
+            </motion.p>
 
-        {/* Search Scanner Input */}
-        <motion.form 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          onSubmit={handleSearchSubmit} 
-          className="w-full max-w-lg mt-8 flex flex-col sm:flex-row gap-2.5 p-1.5 bg-[#161410]/60 border border-neutral-800 rounded-2xl shadow-xl"
-        >
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-neutral-950/40 border border-neutral-850/60 rounded-xl focus-within:border-[var(--color-accent-primary)] transition duration-200">
-            <Search size={14} className="text-neutral-500 shrink-0" />
-            <input 
-              type="text" 
-              placeholder="Enter brand URL (e.g. acme.com)" 
-              className="flex-1 bg-transparent text-xs text-white placeholder-neutral-500 focus:outline-none"
-              value={inputDomain}
-              onChange={(e) => setInputDomain(e.target.value)}
-            />
+            {/* Search Scanner Input */}
+            <motion.form 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              onSubmit={handleSearchSubmit} 
+              className="w-full max-w-md mt-4 flex flex-col sm:flex-row gap-2 p-1 bg-[#161410]/70 border border-neutral-800 rounded-2xl shadow-xl"
+            >
+              <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-neutral-950/40 border border-neutral-850/60 rounded-xl focus-within:border-[var(--color-accent-primary)] transition duration-200">
+                <Search size={14} className="text-neutral-500 shrink-0" />
+                <input 
+                  type="text" 
+                  placeholder="Enter brand URL (e.g. notion.so)" 
+                  className="flex-1 bg-transparent text-xs text-white placeholder-neutral-500 focus:outline-none"
+                  value={inputDomain}
+                  onChange={(e) => setInputDomain(e.target.value)}
+                />
+              </div>
+              <button 
+                type="submit"
+                className="bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-primary-hover)] text-white text-xs font-mono font-bold tracking-wider px-5 py-2.5 rounded-xl uppercase transition shadow-[0_0_15px_rgba(61,107,79,0.3)] shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                Scan Brand <ArrowRight size={12} />
+              </button>
+            </motion.form>
           </div>
-          <button 
-            type="submit"
-            className="bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-primary-hover)] text-white text-xs font-mono font-bold tracking-wider px-5 py-3 rounded-xl uppercase transition shadow-[0_0_15px_rgba(61,107,79,0.3)] shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
+
+          {/* Right: 3D Showcase */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
           >
-            Scan Brand <ArrowRight size={12} />
-          </button>
-        </motion.form>
-
-        {/* Live Simulator Showcase */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="mt-16 w-full flex justify-center"
-        >
-          <InteractiveAuditSimulator />
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <div className="flex flex-col items-center gap-1 text-[var(--color-ink-ghost)] mt-12 select-none">
-          <ChevronDown size={16} className="animate-bounce" />
-          <span className="text-[8px] font-mono uppercase tracking-[0.2em]">Scroll to Explore</span>
+            <Hero3DShowcase />
+          </motion.div>
         </div>
       </section>
 
-      {/* ── Marquee Section ────────────────────── */}
+      {/* ── Scroll Indicator ── */}
+      <div className="flex flex-col items-center gap-1 text-[var(--color-ink-ghost)] pb-12 select-none">
+        <ChevronDown size={16} className="animate-bounce" />
+        <span className="text-[8px] font-mono uppercase tracking-[0.2em]">Explore Platform</span>
+      </div>
+
+      {/* ── Ecosystem Marquee ── */}
       <EcosystemMarquee />
+
+      {/* ── Live Simulator Section ── */}
+      <section className="relative z-10 py-20 px-6 flex flex-col items-center">
+        <div className="text-center mb-12">
+          <span className="text-[11px] font-mono text-[var(--color-accent-copper)] uppercase tracking-widest">
+            AEO Dashboard
+          </span>
+          <h2 className="font-display text-4xl md:text-5xl font-light text-[var(--color-ink-primary)] mt-3">
+            See the Audit in <span className="italic text-gradient-primary">Real-Time.</span>
+          </h2>
+        </div>
+        <InteractiveAuditSimulator />
+      </section>
 
       {/* ── Features Bento Grid ────────────────── */}
       <section className="relative z-10 py-16 px-6 max-w-6xl mx-auto">
