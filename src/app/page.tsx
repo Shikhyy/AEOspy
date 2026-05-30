@@ -812,7 +812,7 @@ export default function AEOspyApp() {
               </div>
 
               {/* Input Card */}
-              <div className="border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-6 rounded-lg shadow-2xl relative overflow-hidden surface-grain text-left flex flex-col gap-4">
+              <div className="glass-panel p-6 rounded-lg shadow-2xl relative overflow-hidden surface-grain text-left flex flex-col gap-4 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]">
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider">Domain URL</label>
                   <div className="relative flex items-center">
@@ -883,13 +883,15 @@ export default function AEOspyApp() {
                   </button>
                 </div>
 
-                <button
+                <motion.button
+                  whileHover={domain ? { scale: 1.02 } : {}}
+                  whileTap={domain ? { scale: 0.98 } : {}}
                   onClick={triggerAudit}
                   disabled={!domain}
-                  className="w-full bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-primary-hover)] text-white text-xs font-mono font-medium py-3 rounded tracking-wider uppercase transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                  className="w-full bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-primary-hover)] text-white text-xs font-mono font-medium py-3 rounded tracking-wider uppercase transition-all duration-300 shadow-[0_0_15px_rgba(61,107,79,0.4)] hover:shadow-[0_0_25px_rgba(61,107,79,0.7)] disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                 >
                   <Sparkles size={14} /> Run AI Visibility Audit
-                </button>
+                </motion.button>
               </div>
 
               {/* Suggestions quick selector */}
@@ -1040,7 +1042,7 @@ export default function AEOspyApp() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* Column 1: Radar & Global Score */}
-                <div className="border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-5 rounded-lg flex flex-col justify-between h-[450px] relative overflow-hidden surface-grain">
+                <div className="glass-panel p-5 rounded-lg flex flex-col justify-between h-[450px] relative overflow-hidden surface-grain transition-transform duration-300 hover:translate-y-[-4px] hover:shadow-2xl">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider">AI Visibility Overview</span>
                     <span className="bg-[var(--color-accent-primary-muted)] text-[var(--color-accent-primary-hover)] text-[9px] font-mono px-2 py-0.5 rounded border border-[var(--color-accent-primary)]">
@@ -1076,7 +1078,7 @@ export default function AEOspyApp() {
                 </div>
 
                 {/* Column 2: Visibility Gap Plot */}
-                <div className="border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-5 rounded-lg flex flex-col justify-between h-[450px] relative overflow-hidden surface-grain">
+                <div className="glass-panel p-5 rounded-lg flex flex-col justify-between h-[450px] relative overflow-hidden surface-grain transition-transform duration-300 hover:translate-y-[-4px] hover:shadow-2xl">
                   <div>
                     <span className="text-[10px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider block mb-1">
                       The Visibility Gap Chart
@@ -1249,7 +1251,7 @@ export default function AEOspyApp() {
               </div>
 
               {/* Bottom: Keyword Citation Matrix Table */}
-              <div className="border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-5 rounded-lg relative overflow-hidden surface-grain mt-2">
+              <div className="glass-panel p-5 rounded-lg relative overflow-hidden surface-grain mt-2 transition-transform duration-300 hover:shadow-2xl">
                 <span className="text-[10px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider block mb-3">
                   Keyword x AI Engine Citation Matrix
                 </span>
@@ -1343,7 +1345,7 @@ export default function AEOspyApp() {
               </div>
 
               {/* Bottom: Action Items Checklist */}
-              <div className="border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-5 rounded-lg relative overflow-hidden surface-grain mt-2">
+              <div className="glass-panel p-5 rounded-lg relative overflow-hidden surface-grain mt-2 transition-transform duration-300 hover:shadow-2xl">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <span className="text-[10px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider">

@@ -99,6 +99,15 @@ body::before {
   border-radius: inherit;
 }
 
+/* Glassmorphism Panel */
+.glass-panel {
+  background: rgba(22, 20, 16, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(242, 237, 228, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
 /* Typography Utility Classes */
 .font-display {
   font-family: var(--font-display);
