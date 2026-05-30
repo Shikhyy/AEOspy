@@ -14,8 +14,10 @@ import {
   MicOff,
   Globe,
   Plus,
-  Settings2
+  Settings2,
+  Terminal,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 
 // --- 3D HTML5 CANVAS PARTICLE COMPONENT ("Awareness Fog") ---
@@ -760,12 +762,10 @@ export default function AEOspyApp() {
 
       {/* Header */}
       <header className="relative z-10 px-6 py-4 flex justify-between items-center border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-base)]/80 backdrop-blur-md">
-        <Link href="/landing" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded bg-[var(--color-accent-primary-muted)] border border-[var(--color-accent-primary)] flex items-center justify-center font-display font-bold text-[var(--color-ink-primary)] group-hover:shadow-[0_0_12px_rgba(61,107,79,0.5)] transition">
-            A
-          </div>
-          <div>
-            <h1 className="font-display italic text-lg tracking-wide leading-none">AEOspy</h1>
+        <Link href="/landing" className="flex items-center group">
+          <Logo size="sm" withText={false} />
+          <div className="ml-2.5">
+            <h1 className="font-display italic text-lg tracking-wide leading-none text-gradient-primary font-semibold">AEOspy</h1>
             <span className="text-[9px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider">Audit Dashboard</span>
           </div>
         </Link>

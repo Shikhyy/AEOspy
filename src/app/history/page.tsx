@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Clock, Search, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 interface AuditHistory {
   id: string;
@@ -45,12 +46,13 @@ export default function HistoryPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="text-[var(--color-ink-tertiary)] hover:text-white transition"
+            className="text-[var(--color-ink-tertiary)] hover:text-white transition mt-1"
           >
             <ArrowLeft size={18} />
           </Link>
-          <div>
-            <h1 className="font-display italic text-lg tracking-wide leading-none">
+          <Logo size="sm" withText={false} />
+          <div className="ml-1">
+            <h1 className="font-display italic text-lg tracking-wide leading-none text-gradient-primary font-semibold">
               AEOspy History
             </h1>
             <span className="text-[9px] font-mono text-[var(--color-ink-tertiary)] uppercase tracking-wider">

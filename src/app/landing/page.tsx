@@ -16,6 +16,7 @@ import {
   Layers,
   TrendingUp,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 // ─────────────────────────────────────────
 // 3D Neural Network Canvas
@@ -382,20 +383,8 @@ export default function LandingPage() {
         transition={{ duration: 0.6 }}
         className="fixed top-0 inset-x-0 z-50 px-6 py-4 flex justify-between items-center glass-panel border-b border-[var(--color-border-subtle)]"
       >
-        <div className="flex items-center gap-2.5">
-          <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="w-8 h-8 rounded-full border border-[var(--color-accent-primary)] bg-[var(--color-accent-primary-muted)] flex items-center justify-center"
-          >
-            <Sparkles size={14} className="text-[var(--color-accent-primary-hover)]" />
-          </motion.div>
-          <div>
-            <span className="font-display italic text-xl tracking-wide">AEOspy</span>
-            <span className="text-[8px] font-mono text-[var(--color-ink-tertiary)] block uppercase tracking-[0.15em]">
-              Answer Engine Intelligence
-            </span>
-          </div>
+        <div className="flex items-center">
+          <Logo size="md" />
         </div>
 
         <div className="flex items-center gap-2">
