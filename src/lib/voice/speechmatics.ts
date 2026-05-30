@@ -53,7 +53,7 @@ export class SpeechmaticsClient {
 
     try {
       const formData = new FormData();
-      const blob = new Blob([audioBuffer], { type: 'audio/wav' });
+      const blob = new Blob([new Uint8Array(audioBuffer)], { type: 'audio/wav' });
       formData.append('data_file', blob, fileName);
       formData.append('config', JSON.stringify({
         type: 'transcription',
