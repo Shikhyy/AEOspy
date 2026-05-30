@@ -57,7 +57,7 @@ function NeuralCanvas() {
       pulseSpeed: number;
     }
 
-    const NODE_COUNT = 80;
+    const NODE_COUNT = 40; // Reduced from 80 for performance
     const COLORS = ["#3D6B4F", "#4D8A64", "#B5714A", "#F2EDE4", "#7A7265", "#C49040"];
     const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => ({
       x: Math.random() * W,
@@ -129,28 +129,18 @@ function NeuralCanvas() {
         const pulseFactor = 1 + Math.sin(n.pulse) * 0.25;
         const radius = n.r * scale * pulseFactor;
 
-        // Glow
-        const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, radius * 4);
-        grd.addColorStop(0, n.color + "60");
-        grd.addColorStop(1, "transparent");
+        // Core (removed expensive radial gradient glow for performance)
         ctx.beginPath();
-        ctx.arc(n.x, n.y, radius * 4, 0, Math.PI * 2);
-        ctx.fillStyle = grd;
-        ctx.fill();
-
-        // Core
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, radius * 1.5, 0, Math.PI * 2);
         ctx.fillStyle = n.color;
-        ctx.globalAlpha = 0.9 * scale;
+        ctx.globalAlpha = 0.8 * scale;
         ctx.fill();
         ctx.globalAlpha = 1;
       });
 
       // Subtle green pulse from center
-      const pulseR = 200 + Math.sin(t * 2) * 30;
-      const centerGrd = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, pulseR);
-      centerGrd.addColorStop(0, "rgba(61, 107, 79, 0.06)");
+      const centerGrd = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 200);
+      centerGrd.addColorStop(0, "rgba(61, 107, 79, 0.04)");
       centerGrd.addColorStop(1, "transparent");
       ctx.fillStyle = centerGrd;
       ctx.fillRect(0, 0, W, H);
@@ -194,9 +184,14 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode, cla
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
     
-    // For the spotlight CSS mask
-    ref.current.style.setProperty("--mouse-x", `${mx}px`);
-    ref.current.style.setProperty("--mouse-y", `${my}px`);
+    let rafId: number;
+    const updateMousePos = () => {
+      if (!ref.current) return;
+      ref.current.style.setProperty("--mouse-x", `${mx}px`);
+      ref.current.style.setProperty("--mouse-y", `${my}px`);
+    };
+
+    rafId = requestAnimationFrame(updateMousePos);
     
     // For Framer Motion tilt
     x.set(mx);
@@ -383,23 +378,22 @@ function FloatingDashboard() {
         rotateY,
         rotateZ,
         transformPerspective: 1500,
-        transformStyle: "preserve-3d"
       }}
-      className="absolute top-[30%] right-[-10%] w-[800px] h-[500px] glass-panel rounded-2xl border border-[var(--color-accent-primary)]/20 opacity-30 pointer-events-none hidden lg:block -z-10"
+      className="absolute top-[30%] right-[-10%] w-[800px] h-[500px] glass-panel rounded-2xl border border-[var(--color-accent-primary)]/20 opacity-30 pointer-events-none hidden lg:block -z-10 will-change-transform"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent-primary-glow)] to-transparent rounded-2xl" />
-      {/* Mock Dashboard UI elements to simulate depth */}
-      <div className="p-8 flex flex-col gap-6 h-full" style={{ transform: "translateZ(30px)" }}>
+      {/* Mock Dashboard UI elements */}
+      <div className="p-8 flex flex-col gap-6 h-full">
         <div className="flex justify-between items-center">
           <div className="w-1/3 h-8 bg-white/5 rounded-lg border border-white/5" />
           <div className="w-16 h-8 rounded-full bg-[var(--color-accent-primary)]/20 border border-[var(--color-accent-primary)]/40" />
         </div>
         <div className="flex gap-6">
-          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" style={{ transform: "translateZ(20px)" }} />
-          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" style={{ transform: "translateZ(40px)" }} />
-          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" style={{ transform: "translateZ(10px)" }} />
+          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" />
+          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" />
+          <div className="flex-1 h-32 bg-white/5 rounded-xl border border-white/5" />
         </div>
-        <div className="flex-1 bg-white/5 rounded-xl border border-white/5 mt-2" style={{ transform: "translateZ(50px)" }} />
+        <div className="flex-1 bg-white/5 rounded-xl border border-white/5 mt-2" />
       </div>
     </motion.div>
   );

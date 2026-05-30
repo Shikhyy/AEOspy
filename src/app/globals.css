@@ -109,8 +109,8 @@ body::before {
 /* Glassmorphism Panel */
 .glass-panel {
   background: rgba(22, 20, 16, 0.55);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(242, 237, 228, 0.08);
   box-shadow: 
     0 24px 64px 0 rgba(0, 0, 0, 0.4),
