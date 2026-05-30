@@ -65,16 +65,23 @@ body::before {
   background: 
     radial-gradient(
       ellipse 80% 50% at 20% 20%,
-      rgba(61, 107, 79, 0.05) 0%,
+      rgba(61, 107, 79, 0.07) 0%,
       transparent 65%
     ),
     radial-gradient(
       ellipse 60% 40% at 85% 85%,
-      rgba(181, 113, 74, 0.04) 0%,
+      rgba(181, 113, 74, 0.05) 0%,
       transparent 55%
     );
   pointer-events: none;
   z-index: 0;
+  animation: ambientDrift 20s ease-in-out infinite alternate;
+}
+
+@keyframes ambientDrift {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
+  50% { transform: scale(1.1) translate(2%, 3%); opacity: 1; }
+  100% { transform: scale(0.95) translate(-1%, -2%); opacity: 0.7; }
 }
 
 /* Subtle map grid texture on dark backgrounds */
@@ -101,11 +108,45 @@ body::before {
 
 /* Glassmorphism Panel */
 .glass-panel {
-  background: rgba(22, 20, 16, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(22, 20, 16, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(242, 237, 228, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 24px 64px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Dynamic Spotlight Hover */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(
+    800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(242, 237, 228, 0.06),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 0;
+}
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* Premium Text Gradients */
+.text-gradient-primary {
+  background: linear-gradient(to right, var(--color-ink-primary), var(--color-ink-tertiary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Typography Utility Classes */

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from "framer-motion";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -178,6 +178,45 @@ function NeuralCanvas() {
 // ─────────────────────────────────────────
 // Floating feature cards
 // ─────────────────────────────────────────
+
+function TiltCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const x = useMotionValue(150);
+  const y = useMotionValue(150);
+  const rotateX = useTransform(y, [0, 300], [5, -5]);
+  const rotateY = useTransform(x, [0, 300], [-5, 5]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    
+    // For the spotlight CSS mask
+    ref.current.style.setProperty("--mouse-x", `${mx}px`);
+    ref.current.style.setProperty("--mouse-y", `${my}px`);
+    
+    // For Framer Motion tilt
+    x.set(mx);
+    y.set(my);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => {
+        x.set(150);
+        y.set(150);
+      }}
+      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      className={`glass-panel spotlight-card rounded-xl ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+}
 const FEATURES = [
   {
     icon: Bot,
@@ -301,7 +340,7 @@ function TypingHeadline() {
   }, [displayed, deleting, idx]);
 
   return (
-    <span className="text-[var(--color-accent-primary-hover)]">
+    <span className="text-gradient-primary">
       {displayed}
       <motion.span
         animate={{ opacity: [1, 0] }}
@@ -406,7 +445,7 @@ export default function LandingPage() {
             <TypingHeadline />
             <br />
             <span className="text-[var(--color-ink-secondary)] font-light">Find out with </span>
-            <span className="italic">AEOspy.</span>
+            <span className="italic text-gradient-primary">AEOspy.</span>
           </motion.h1>
 
           {/* Sub-headline */}
@@ -510,16 +549,15 @@ export default function LandingPage() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
           {FEATURES.map((feat, i) => (
-            <motion.div
+            <TiltCard
               key={feat.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="glass-panel p-6 rounded-xl flex flex-col gap-4 cursor-default group"
+              className="p-6 flex flex-col gap-4 cursor-default group"
             >
               <div
                 className="w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
@@ -535,7 +573,7 @@ export default function LandingPage() {
                   {feat.desc}
                 </p>
               </div>
-            </motion.div>
+            </TiltCard>
           ))}
         </div>
       </section>
@@ -571,9 +609,9 @@ export default function LandingPage() {
               className="relative flex flex-col gap-4"
             >
               {i < 2 && (
-                <div className="hidden md:block absolute left-full top-8 w-full h-px border-t border-dashed border-[var(--color-border-default)] -translate-x-4 z-0" />
+                <div className="hidden md:block absolute left-full top-8 w-full h-px border-t border-dashed border-[var(--color-border-strong)] -translate-x-4 z-0" />
               )}
-              <div className="glass-panel p-6 rounded-xl flex flex-col gap-4 relative z-10">
+              <TiltCard className="p-6 flex flex-col gap-4 relative z-10 h-full">
                 <div className="flex items-start justify-between">
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -589,7 +627,7 @@ export default function LandingPage() {
                   <h3 className="font-semibold text-sm text-[var(--color-ink-primary)] mb-1.5">{step.title}</h3>
                   <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">{step.desc}</p>
                 </div>
-              </div>
+              </TiltCard>
             </motion.div>
           ))}
         </div>
